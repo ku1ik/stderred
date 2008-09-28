@@ -23,9 +23,13 @@ static const char CYAN[]    = "\x1b[36m";
 
 /* Not including background colors for no good reason */
 
+static void * libc = NULL;
+
 int write(int fd, const void* buf, int count) {
   /* Always: yoink old write from libc */
-  void * libc = dlopen("/lib/libc.so.6", RTLD_LAZY); /* never closed, rofl */
+  if (libc == NULL) {
+    libc = dlopen("/lib/libc.so.6", RTLD_LAZY); /* never closed, rofl */
+  }
   int (*lol_write) (int, const void *, int);
   *(void **) (&lol_write) = dlsym(libc, "write"); 
 
