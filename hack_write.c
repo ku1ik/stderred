@@ -19,6 +19,8 @@ static const char BLUE[]    = "\x1b[34m";
 static const char MAGENTA[] = "\x1b[35m";
 static const char CYAN[]    = "\x1b[36m";
 
+#define STDERR_COLOR RED
+
 /* Not including background colors for no good reason */
 
 int write(int fd, const void* buf, int count) {
@@ -29,11 +31,11 @@ int write(int fd, const void* buf, int count) {
 
   if (fd == 2) {
     /* Do crazy nonsense to buf and count */
-    int new_count = count + sizeof(RED) + sizeof(COL_RESET);
+    int new_count = count + sizeof(STDERR_COLOR) + sizeof(COL_RESET);
     void * new_buf = alloca(new_count);
-    memcpy(new_buf, RED, sizeof(RED));
-    memcpy(new_buf + sizeof(RED), buf, count);
-    memcpy(new_buf + sizeof(RED) + count, COL_RESET, sizeof(COL_RESET));
+    memcpy(new_buf, STDERR_COLOR, sizeof(STDERR_COLOR));
+    memcpy(new_buf + sizeof(STDERR_COLOR), buf, count);
+    memcpy(new_buf + sizeof(STDERR_COLOR) + count, COL_RESET, sizeof(COL_RESET));
     (*lol_write)(fd, new_buf, new_count);
   }
   else {
