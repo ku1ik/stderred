@@ -1,0 +1,57 @@
+This tool wraps another program (the original request was to wrap a Java program) and makes all output to standard error ("stderr") red.  Therefore the tool is called "stderred."
+
+HOW TO USE IT
+
+First, compile it.  Just run:
+
+	$ make
+
+Then use it.  For example, compile the given Java test program:
+
+	$ javac test.java
+
+Then run it with regular Java:
+
+	$ java test
+
+You'll see nothing is red.  Then run it with "stderred":
+
+	$ LD_PRELOAD=./stderred.so java test
+
+Ta-da!  stderr is colorized red!
+
+COPYING
+
+You are free to use this program under the terms of the expat license:
+
+Copyright (c) 2008 Asheesh Laroia <stderred@asheesh.org>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+BONUS FEATURES
+
+You can configure which color it uses by adjusting the #define STDERR_COLOR.
+
+WANT MORE?
+
+I wrapped more C functions than just write() (which seems to be all Sun's JRE uses), but by no means all of them, and you can see that work in my git branches.  I ran into some issue I couldn't figure out with error() so I just abruptly stopped.  If you wanted to go bonkers, you could get the glibc source, put in a patch like what my custom write() does, recompile it, and LD_PRELOAD your entire new glibc before the program.
+
+-- Asheesh 2008-09-27.
+
