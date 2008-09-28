@@ -1,5 +1,5 @@
 #define write ye_olde_write
-#include <stdio.h>
+#include <unistd.h>
 
 #include <dlfcn.h>
 
