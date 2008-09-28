@@ -1,11 +1,9 @@
-#define fwrite ye_olde_fwrite
-#define fwrite_unlocked ye_olde_fwrite_unlocked
+#define write ye_olde_write
 #include <stdio.h>
 
 #include <dlfcn.h>
 
-#undef fwrite
-#undef fwrite_unlocked
+#undef write
 
 /* SOURCE: http://deathray.us/code/color_output.html */
 
@@ -21,50 +19,28 @@ static const char CYAN[]    = "\x1b[36m";
 
 /* Not including background colors for no good reason */
 
-int fwrite(const void *ptr, int size, int nmemb,
-	   FILE *stream) {
-  
+int write(int fd, const void* buf, int count) {
+  int destination_fd = fd;
   void * libc = dlopen("/lib/libc.so.6", RTLD_LAZY); /* never closed, rofl */
-  int (*lol_fwrite) (const void *, int, int, FILE *);
-  *(void **) (&lol_fwrite) = dlsym(libc, "fwrite");
-  
-  if (stream  == stderr) {
-    (*lol_fwrite)(RED, 1, sizeof(RED), stream);
-  } else if (stream == stdout) {
-    (*lol_fwrite)(BLUE, 1, sizeof(BLUE), stream);
+  int (*lol_write) (int, const void *, int);
+  *(void **) (&lol_write) = dlsym(libc, "write");
+
+  /* always do the write, but if it was to either 1 or 2 put it on 1 */
+  if ( (fd == 1) ||
+       (fd == 2)) {
+    destination_fd = 1;
   }
 
-  /* always actually do the write() */
-  (*lol_fwrite)(ptr, size, nmemb, stream);
-  
-  if ( (stream == stderr) ||
-       (stream == stdout )) {
-    (*lol_fwrite)(COL_RESET, 1, sizeof(COL_RESET), stream);
+  if (fd == 2) /* stderr */ {
+    (*lol_write)(destination_fd, RED, sizeof(RED));
   }
+
+  (*lol_write)(destination_fd, buf, count);
+  
+  if (fd == 2) {
+    (*lol_write)(destination_fd, COL_RESET, sizeof(COL_RESET));
+  }  
   
 }
 
-
-int fwrite_unlocked(const void *ptr, int size, int nmemb,
-	   FILE *stream) {
   
-  void * libc = dlopen("/lib/libc.so.6", RTLD_LAZY); /* never closed, rofl */
-  int (*lol_fwrite_unlocked) (const void *, int, int, FILE *);
-  *(void **) (&lol_fwrite_unlocked) = dlsym(libc, "fwrite_unlocked");
-  
-  if (stream  == stderr) {
-    (*lol_fwrite_unlocked)(RED, 1, sizeof(RED), stream);
-  } else if (stream == stdout) {
-    (*lol_fwrite_unlocked)(BLUE, 1, sizeof(BLUE), stream);
-  }
-
-  /* always actually do the write() */
-  (*lol_fwrite_unlocked)(ptr, size, nmemb, stream);
-  
-  if ( (stream == stderr) ||
-       (stream == stdout )) {
-    (*lol_fwrite_unlocked)(COL_RESET, 1, sizeof(COL_RESET), stream);
-  }
-  
-}
-
