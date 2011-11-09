@@ -29,7 +29,7 @@ static int (*lol_write) (int, const void *, int);
 int write(int fd, const void* buf, int count) {
   /* Always: yoink old write from libc */
   if (libc == NULL) {
-    libc = dlopen("/lib/libc.so.6", RTLD_LAZY); /* never closed, rofl */
+    libc = dlopen("/lib64/libc.so.6", RTLD_LAZY); /* never closed, rofl */
     *(void **) (&lol_write) = dlsym(libc, "write"); 
   }
 
