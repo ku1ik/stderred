@@ -41,8 +41,9 @@ int write(int fd, const void* buf, int count) {
     memcpy(new_buf + sizeof(STDERR_COLOR), buf, count);
     memcpy(new_buf + sizeof(STDERR_COLOR) + count, COL_RESET, sizeof(COL_RESET));
     (*lol_write)(fd, new_buf, new_count);
+    return count;
   }
   else {
-    (*lol_write)(fd, buf, count);
+    return (*lol_write)(fd, buf, count);
   }
 }
