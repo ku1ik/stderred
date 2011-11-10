@@ -21,6 +21,9 @@ static const char CYAN[]    = "\x1b[36m";
 
 #define STDERR_COLOR RED
 
+#define STDERR_COLOR_SIZE sizeof(STDERR_COLOR)-1
+#define COL_RESET_SIZE sizeof(COL_RESET)-1
+
 /* Not including background colors for no good reason */
 
 static void * libc = NULL;
@@ -35,11 +38,11 @@ int write(int fd, const void* buf, int count) {
 
   if (fd == 2) {
     /* Do crazy nonsense to buf and count */
-    int new_count = count + sizeof(STDERR_COLOR) + sizeof(COL_RESET);
+    int new_count = count + STDERR_COLOR_SIZE + COL_RESET_SIZE;
     void * new_buf = alloca(new_count);
-    memcpy(new_buf, STDERR_COLOR, sizeof(STDERR_COLOR));
-    memcpy(new_buf + sizeof(STDERR_COLOR), buf, count);
-    memcpy(new_buf + sizeof(STDERR_COLOR) + count, COL_RESET, sizeof(COL_RESET));
+    memcpy(new_buf, STDERR_COLOR, STDERR_COLOR_SIZE);
+    memcpy(new_buf + STDERR_COLOR_SIZE, buf, count);
+    memcpy(new_buf + STDERR_COLOR_SIZE + count, COL_RESET, COL_RESET_SIZE);
     (*lol_write)(fd, new_buf, new_count);
     return count;
   }
