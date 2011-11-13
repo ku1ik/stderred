@@ -42,7 +42,7 @@ int write(int fd, const void* buf, int count) {
     *(void **) (&lol_write) = dlsym(libc, "write");
   }
 
-  if (fd == 2) {
+  if (fd == 2 && isatty(2)) {
     /* Do crazy nonsense to buf and count */
     int new_count = count + STDERR_COLOR_SIZE + COL_RESET_SIZE;
     void * new_buf = alloca(new_count);
