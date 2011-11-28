@@ -1,2 +1,2 @@
 stderred.so: write.c
-	gcc write.c -Wall -ldl -fPIC -shared -o stderred.so
+	gcc write.c -D_GNU_SOURCE -Wall -ldl -fPIC -shared -o stderred.so

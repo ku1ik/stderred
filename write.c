@@ -24,22 +24,13 @@ static const char CYAN[]    = "\x1b[36m";
 #define STDERR_COLOR_SIZE sizeof(STDERR_COLOR)-1
 #define COL_RESET_SIZE sizeof(COL_RESET)-1
 
-#if __x86_64__ || __ppc64__
-#define LIBC_PATH "/lib64/libc.so.6"
-#else
-#define LIBC_PATH "/lib/libc.so.6"
-#endif
-
 /* Not including background colors for no good reason */
 
-static void * libc = NULL;
 static int (*lol_write) (int, const void *, int);
 
 int write(int fd, const void* buf, int count) {
-  /* Always: yoink old write from libc */
-  if (libc == NULL) {
-    libc = dlopen(LIBC_PATH, RTLD_LAZY); /* never closed, rofl */
-    *(void **) (&lol_write) = dlsym(libc, "write");
+  if (lol_write == NULL) {
+    *(void **) (&lol_write) = dlsym(RTLD_NEXT, "write");
   }
 
   if (fd == 2 && isatty(2)) {
