@@ -1,5 +1,3 @@
-This tool wraps another program (the original request was to wrap a Java program) and makes all output to standard error ("stderr") red.  Therefore the tool is called "stderred."
-
 HOW TO USE IT
 
 First, compile it.  Just run:
