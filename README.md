@@ -4,7 +4,7 @@ stderr in red.
 
 ## About
 
-stderred "monkey patches" write() function from libc in order to colorize all
+stderred hooks on write() function from libc in order to colorize all
 stderr output that goes to terminal thus making it distinguishable from stdout.
 Basically it wraps text that goes to file with descriptor "2" with proper
 escape codes making text red.
