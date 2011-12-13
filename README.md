@@ -12,7 +12,7 @@ escape codes making text red.
 It's implemented as a shared library and doesn't require recompilation of
 existing binaries thanks to LD_PRELOAD feature of Linux dynamic linker.
 
-## Instalation
+## Installation
 
 Clone this repository:
 
@@ -46,6 +46,12 @@ for run commands:
     $ alias stderred='LD_PRELOAD=/absolute/path/to/lib/stderred.so'
     $ stderred java lol
 
+### Checking if it works
+
+    $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
+
+Jola should be in red dress.
+
 ### Multi-arch distros
 
 On most Linux distros you can run 32-bit binaries on 64-bit system.  Shared
@@ -76,12 +82,6 @@ and export LD_PRELOAD like this:
 
 
 Ubuntu doesn't support DST (http://comments.gmane.org/gmane.comp.lib.glibc.user/868)
-
-## Checking if it works
-
-    $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
-
-Jola should be in red dress.
 
 ## Authors
 
