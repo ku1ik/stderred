@@ -54,6 +54,8 @@ Make sure that path to `stderred.so` is absolute!
 
 Jola should be in red dress.
 
+![stderred in action](https://github.com/downloads/sickill/stderred/stderred.png)
+
 ### Multi-arch distros
 
 _\* Ignore this section if using Ubuntu. Ubuntu prefers architecture purity and
