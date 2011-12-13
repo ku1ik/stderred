@@ -46,6 +46,8 @@ for run commands:
     $ alias stderred='LD_PRELOAD=/absolute/path/to/lib/stderred.so'
     $ stderred java lol
 
+Make sure that path to `stderred.so` is absolute!
+
 ### Checking if it works
 
     $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
@@ -83,6 +85,14 @@ compile it like this:
 and export `LD_PRELOAD` like this in your shell's config:
 
     export LD_PRELOAD="/path/to/stderred/\$LIB/stderred.so"
+
+## Alternative implementations
+
+Simpler and much less reliable solution when using Zsh is to use named pipes
+trick proposed on
+[Gentoo Linux wiki](http://en.gentoo-wiki.com/wiki/Zsh#Colorize_STDERR).
+It has some race condition/buffering issues and breaks on interactive commands
+writing to stderr though.
 
 ## Authors
 
