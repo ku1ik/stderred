@@ -10,7 +10,7 @@ Basically it wraps text that goes to file with descriptor "2" with proper
 escape codes making text red.
 
 It's implemented as a shared library and doesn't require recompilation of
-existing binaries thanks to LD_PRELOAD feature of Linux dynamic linker.
+existing binaries thanks to `LD_PRELOAD` feature of Linux dynamic linker.
 
 ## Installation
 
@@ -33,7 +33,7 @@ For 64-bit system:
 
 You can enable stderred in 2 ways.
 
-Recommended one is to export LD_PRELOAD variable in your shell's config file.
+Recommended one is to export `LD_PRELOAD` variable in your shell's config file.
 Put following in you .bashrc/.zshrc:
 
     if [ -f "/absolute/path/to/lib/stderred.so" ]; then
@@ -54,13 +54,17 @@ Jola should be in red dress.
 
 ### Multi-arch distros
 
-On most Linux distros you can run 32-bit binaries on 64-bit system.  Shared
+_\* Ignore this section if using Ubuntu. Ubuntu prefers architecture purity and
+doesn't allow coexisting 32 and 64-bit packages on the same installation. Thus
+this problem doesn't exist on this distro._
+
+On some Linux distros you can run 32-bit binaries on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
 happens that 64-bit binaries call 32-bit ones resulting in warning message
-printed to terminal about not compatible LD_PRELOAD shared lib.
+printed to terminal about not compatible `LD_PRELOAD` shared lib.
 
 Fortunately Linux's dynamic linker has a feature called Dynamic String Token
-(DST). It allows dynamic substitution of `$LIB` token in LD_PRELOAD variable
+(DST). It allows dynamic substitution of `$LIB` token in `LD_PRELOAD` variable
 with "lib" or "lib64" respectively for 32 and 64-bit binaries when the binary
 is being run.
 
@@ -70,22 +74,21 @@ automatically use proper version of this shared library.
 On Fedora, for example, you need to install libc development headers for both
 architectures:
 
-    sudo yum install libc-devel.i686 libc-devel.x86-64
+    $ sudo yum install glibc-devel.i686 glibc-devel.x86_64
 
 compile it like this:
 
-    make both
+    $ make both
 
-and export LD_PRELOAD like this:
+and export `LD_PRELOAD` like this in your shell's config:
 
     export LD_PRELOAD="/path/to/stderred/\$LIB/stderred.so"
 
-
-Ubuntu doesn't support DST (http://comments.gmane.org/gmane.comp.lib.glibc.user/868)
-
 ## Authors
 
-Asheesh Laroia - original concept and initial implementation
+Asheesh Laroia -
+[original concept](http://www.asheesh.org/note/software/stderred.html) and
+[initial implementation](http://git.asheesh.org/?p=zzz/colorize-stderr.git;a=summary)
 
 Marcin Kulik - current implementation
 
