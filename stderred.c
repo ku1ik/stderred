@@ -30,9 +30,9 @@ static const char CYAN[]    = "\x1b[36m";
 
 /* Not including background colors for no good reason */
 
-static int (*lol_write) (int, const void *, int);
+static ssize_t (*lol_write) (int, const void *, size_t);
 
-int write(int fd, const void* buf, int count) {
+ssize_t write(int fd, const void *buf, size_t count) {
   if (lol_write == NULL) {
     *(void **) (&lol_write) = dlsym(RTLD_NEXT, "write");
     if (lol_write == NULL) {
