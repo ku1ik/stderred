@@ -31,6 +31,10 @@ static int (*lol_write) (int, const void *, int);
 int write(int fd, const void* buf, int count) {
   if (lol_write == NULL) {
     *(void **) (&lol_write) = dlsym(RTLD_NEXT, "write");
+    if (lol_write == NULL) {
+      /* Could not find the original write, return with error */
+      return -1;
+    }
   }
 
   if (fd == 2 && isatty(2)) {
