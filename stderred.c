@@ -33,7 +33,7 @@ ssize_t write(int fd, const void* buf, size_t count) {
     else if (written <= STDERR_COLOR_SIZE)
       return 0;
 
-    written -= STDERR_COLOR_SIZE;
+    written -= (STDERR_COLOR_SIZE + COL_RESET_SIZE);
     return written >= count ? count : written;
   }
   else {
