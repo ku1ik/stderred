@@ -5,8 +5,6 @@
 
 #undef write
 
-/* SOURCE: http://deathray.us/code/color_output.html */
-
 static const char COL_RESET[] = "\x1b[0m";
 
 /*  Foreground colors are in form of 3x, background are 4x */
@@ -21,8 +19,6 @@ static const char CYAN[]    = "\x1b[36m";
 
 #define STDERR_COLOR_SIZE sizeof(STDERR_COLOR)-1
 #define COL_RESET_SIZE sizeof(COL_RESET)-1
-
-/* Not including background colors for no good reason */
 
 ssize_t write(int fd, const void* buf, size_t count) {
   if (fd == 2 && isatty(2)) {
