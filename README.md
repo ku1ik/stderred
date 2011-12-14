@@ -48,6 +48,10 @@ for run commands:
 
 Make sure that path to `stderred.so` is absolute!
 
+Note: on a Mac, the following may be necessary instead:
+
+    $ export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/stderred.so DYLD_FORCE_FLAT_NAMESPACE=1
+
 ### Checking if it works
 
     $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
