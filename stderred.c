@@ -24,7 +24,7 @@ static const char CYAN[]    = "\x1b[36m";
 
 /* Not including background colors for no good reason */
 
-int write(int fd, const void* buf, int count) {
+ssize_t write(int fd, const void* buf, int count) {
   if (fd == 2 && isatty(2)) {
     struct iovec vec[3] = {
       { (char *)STDERR_COLOR, STDERR_COLOR_SIZE },
