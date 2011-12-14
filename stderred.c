@@ -1,7 +1,11 @@
 #define write ye_olde_write
 #include <unistd.h>
 #include <string.h>
+#ifndef __FreeBSD__
 #include <alloca.h>
+#else
+extern char *alloca(size_t);
+#endif
 
 #include <dlfcn.h>
 
