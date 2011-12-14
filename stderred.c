@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <alloca.h>
-
+#include <sys/uio.h>
 #include <dlfcn.h>
 
 #undef write
@@ -28,20 +28,21 @@ static const char CYAN[]    = "\x1b[36m";
 
 static int (*lol_write) (int, const void *, int);
 
+static struct iovec iov[] = {
+  {.iov_base = STDERR_COLOR, .iov_len = STDERR_COLOR_SIZE },
+  {.iov_base = NULL, .iov_len = 0 },
+  {.iov_base = COL_RESET, .iov_len = COL_RESET_SIZE }
+};
+
 int write(int fd, const void* buf, int count) {
   if (lol_write == NULL) {
     *(void **) (&lol_write) = dlsym(RTLD_NEXT, "write");
   }
 
   if (fd == 2 && isatty(2)) {
-    /* Do crazy nonsense to buf and count */
-    int new_count = count + STDERR_COLOR_SIZE + COL_RESET_SIZE;
-    void * new_buf = alloca(new_count);
-    memcpy(new_buf, STDERR_COLOR, STDERR_COLOR_SIZE);
-    memcpy(new_buf + STDERR_COLOR_SIZE, buf, count);
-    memcpy(new_buf + STDERR_COLOR_SIZE + count, COL_RESET, COL_RESET_SIZE);
-    (*lol_write)(fd, new_buf, new_count);
-    return count;
+    iov[1].iov_base = buf;
+    iov[1].iov_len = count;
+    return writev(fd, iov, 3);
   }
   else {
     return (*lol_write)(fd, buf, count);
