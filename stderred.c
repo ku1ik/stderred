@@ -4,6 +4,7 @@
 #include <alloca.h>
 #include <sys/uio.h>
 #include <dlfcn.h>
+#include <sys/syscall.h>
 
 #undef write
 
@@ -26,8 +27,6 @@ static const char CYAN[]    = "\x1b[36m";
 
 /* Not including background colors for no good reason */
 
-static int (*lol_write) (int, const void *, int);
-
 static struct iovec iov[] = {
   {.iov_base = STDERR_COLOR, .iov_len = STDERR_COLOR_SIZE },
   {.iov_base = NULL, .iov_len = 0 },
@@ -35,16 +34,10 @@ static struct iovec iov[] = {
 };
 
 int write(int fd, const void* buf, int count) {
-  if (lol_write == NULL) {
-    *(void **) (&lol_write) = dlsym(RTLD_NEXT, "write");
-  }
-
   if (fd == 2 && isatty(2)) {
     iov[1].iov_base = buf;
     iov[1].iov_len = count;
     return writev(fd, iov, 3);
   }
-  else {
-    return (*lol_write)(fd, buf, count);
-  }
+  return syscall(SYS_write, fd, buf, count);
 }
