@@ -1,9 +1,7 @@
 #define write ye_olde_write
 #include <unistd.h>
 #include <string.h>
-#include <alloca.h>
-
-#include <dlfcn.h>
+#include <sys/uio.h>
 
 #undef write
 
@@ -26,28 +24,25 @@ static const char CYAN[]    = "\x1b[36m";
 
 /* Not including background colors for no good reason */
 
-static int (*lol_write) (int, const void *, int);
-
 int write(int fd, const void* buf, int count) {
-  if (lol_write == NULL) {
-    *(void **) (&lol_write) = dlsym(RTLD_NEXT, "write");
-    if (lol_write == NULL) {
-      /* Could not find the original write, return with error */
-      return -1;
-    }
-  }
-
   if (fd == 2 && isatty(2)) {
-    /* Do crazy nonsense to buf and count */
-    int new_count = count + STDERR_COLOR_SIZE + COL_RESET_SIZE;
-    void * new_buf = alloca(new_count);
-    memcpy(new_buf, STDERR_COLOR, STDERR_COLOR_SIZE);
-    memcpy(new_buf + STDERR_COLOR_SIZE, buf, count);
-    memcpy(new_buf + STDERR_COLOR_SIZE + count, COL_RESET, COL_RESET_SIZE);
-    (*lol_write)(fd, new_buf, new_count);
-    return count;
+    struct iovec vec[3] = {
+      { (char *)STDERR_COLOR, STDERR_COLOR_SIZE },
+      { (char *)buf, count },
+      { (char *)COL_RESET, COL_RESET_SIZE }
+    };
+
+    ssize_t written = writev(fd, vec, sizeof(vec) / sizeof(vec[0]));
+    if (written < 0)
+      return written;
+    else if (written <= STDERR_COLOR_SIZE)
+      return 0;
+
+    written -= STDERR_COLOR_SIZE;
+    return written >= count ? count : written;
   }
   else {
-    return (*lol_write)(fd, buf, count);
+    struct iovec vec = { (char *)buf, count };
+    return writev(fd, &vec, 1);
   }
 }
