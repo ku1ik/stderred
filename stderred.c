@@ -1,4 +1,3 @@
-#define write ye_olde_write
 #include <unistd.h>
 #include <string.h>
 #include <sys/uio.h>
