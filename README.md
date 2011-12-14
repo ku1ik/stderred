@@ -102,11 +102,14 @@ writing to stderr though.
 
 ## Authors
 
-Asheesh Laroia -
-[original concept](http://www.asheesh.org/note/software/stderred.html) and
-[initial implementation](http://git.asheesh.org/?p=zzz/colorize-stderr.git;a=summary)
+[Original concept](http://www.asheesh.org/note/software/stderred.html) and
+[initial implementation](http://git.asheesh.org/?p=zzz/colorize-stderr.git;a=summary):
 
-Marcin Kulik - current implementation
+Asheesh Laroia
+
+Current implementation:
+
+Marcin Kulik, Brian Tarricone
 
 ## License
 
