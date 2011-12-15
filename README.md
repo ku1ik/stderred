@@ -10,63 +10,39 @@ Basically it wraps text that goes to file with descriptor "2" with proper
 escape codes making text red.
 
 It's implemented as a shared library and doesn't require recompilation of
-existing binaries thanks to `LD_PRELOAD` feature of Linux dynamic linker.
+existing binaries thanks to "preload/insert" feature of dynamic linkers.
+
+It's supported on Linux (with `LD_PRELOAD`), FreeBSD (also `LD_PRELOAD`) and
+OSX (with `DYLD_INSERT_LIBRARIES`).
 
 ## Installation
 
 Clone this repository:
 
-    git clone git://github.com/sickill/stderred.git
-    cd stderred
+    $ git clone git://github.com/sickill/stderred.git
+    $ cd stderred
 
-### Compiling
+Important: In all cases below make sure that path to `stderred.so` is absolute!
 
-For 32-bit system:
+### Linux and FreeBSD 32-bit
 
-    make lib/stderred.so
+    $ make lib/stderred.so
 
-For 64-bit system:
+Export `LD_PRELOAD` variable in your shell's config file by putting following
+in your .bashrc/.zshrc:
 
-    make lib64/stderred.so
+    export LD_PRELOAD="/absolute/path/to/lib/stderred.so"
 
-### Enabling
+### Linux and FreeBSD 64-bit
 
-You can enable stderred in 2 ways.
+    $ make lib64/stderred.so
 
-Recommended one is to export `LD_PRELOAD` variable in your shell's config file.
-Put following in you .bashrc/.zshrc:
+Export `LD_PRELOAD` variable in your shell's config file by putting following
+in your .bashrc/.zshrc:
 
-    if [ -f "/absolute/path/to/lib/stderred.so" ]; then
-      export LD_PRELOAD="/absolute/path/to/lib/stderred.so"
-    fi
+    export LD_PRELOAD="/absolute/path/to/lib64/stderred.so"
 
-Second option is to create alias and then use it to selectively colorize stderr
-for run commands:
-
-    $ alias stderred='LD_PRELOAD=/absolute/path/to/lib/stderred.so'
-    $ stderred java lol
-
-Make sure that path to `stderred.so` is absolute!
-
-Note: on a Mac, the following may be necessary instead:
-
-    $ export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/stderred.so DYLD_FORCE_FLAT_NAMESPACE=1
-
-### Checking if it works
-
-    $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
-
-Jola should be in red dress.
-
-![stderred in action](https://github.com/downloads/sickill/stderred/stderred.png)
-
-### Multi-arch distros
-
-_\* Ignore this section if using Ubuntu. Ubuntu prefers architecture purity and
-doesn't allow coexisting 32 and 64-bit packages on the same installation. Thus
-this problem doesn't exist on this distro._
-
-On some Linux distros you can run 32-bit binaries on 64-bit system.  Shared
+On some Linux distros you can install 32-bit packages on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
 happens that 64-bit binaries call 32-bit ones resulting in warning message
 printed to terminal about not compatible `LD_PRELOAD` shared lib.
@@ -74,13 +50,11 @@ printed to terminal about not compatible `LD_PRELOAD` shared lib.
 Fortunately Linux's dynamic linker has a feature called Dynamic String Token
 (DST). It allows dynamic substitution of `$LIB` token in `LD_PRELOAD` variable
 with "lib" or "lib64" respectively for 32 and 64-bit binaries when the binary
-is being run.
+is being run. Thanks to that you can compile stderred for both architectures
+and automatically use proper version of this shared library.
 
-Thanks to that you can compile stderred for both architectures and
-automatically use proper version of this shared library.
-
-On Fedora, for example, you need to install libc development headers for both
-architectures:
+On 64-bit Fedora, for example, you need to install libc development headers for
+both architectures:
 
     $ sudo yum install glibc-devel.i686 glibc-devel.x86_64
 
@@ -91,6 +65,32 @@ compile it like this:
 and export `LD_PRELOAD` like this in your shell's config:
 
     export LD_PRELOAD="/path/to/stderred/\$LIB/stderred.so"
+
+### OSX 64-bit
+
+    $ make both
+    $ lipo -create lib/stderred.so lib64/stderred.so -output lib/stderred.dylib
+
+Export `DYLD_INSERT_LIBRARIES` variable in your shell's config file by putting following
+in your .bashrc/.zshrc:
+
+    export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/stderred.dylib DYLD_FORCE_FLAT_NAMESPACE=1
+
+### Aliasing
+
+Alternative to enabling it globally via shell config is to create alias and
+use it to selectively colorize stderr for the commands you run:
+
+    $ alias stderred='LD_PRELOAD=/absolute/path/to/lib/stderred.so'
+    $ stderred java lol
+
+### Checking if it works
+
+    $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
+
+Jola should be in red dress.
+
+![stderred in action](https://github.com/downloads/sickill/stderred/stderred.png)
 
 ## Alternative implementations
 
@@ -105,11 +105,12 @@ writing to stderr though.
 [Original concept](http://www.asheesh.org/note/software/stderred.html) and
 [initial implementation](http://git.asheesh.org/?p=zzz/colorize-stderr.git;a=summary):
 
-Asheesh Laroia
+* Asheesh Laroia
 
 Current implementation:
 
-Marcin Kulik, Brian Tarricone
+* Marcin Kulik
+* Brian Tarricone
 
 ## License
 
