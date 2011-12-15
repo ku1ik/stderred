@@ -188,9 +188,30 @@ void error_at_line(int status, int errnum, const char *fname, unsigned int linen
 }
 
 #ifndef __USE_GNU
+/*
+ * Copyright (C) 2001 Federico Di Gregorio <fog@debian.org> 
+ * Copyright (C) 1991, 1994-1999, 2000, 2001 Free Software Foundation, Inc.
+ *
+ * This code has been derived from an example in the glibc2 documentation.
+ * This file is part of the psycopg module.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2,
+ * or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ */
+
 int asprintf(char **buffer, char *format, ...) {
-  char *tmpbuff;
-  /* guess we need no more than 200 chars of space (this could be considered wasteful...) */
+  /* guess we need no more than 200 chars of space */
   int size = 200;
   int nchars;
   va_list ap;
@@ -198,18 +219,22 @@ int asprintf(char **buffer, char *format, ...) {
   if ((*buffer = malloc(size)) == NULL)
     return -ENOMEM;
 
+  /* try to print in the allocated space */
   va_start(ap, format);
   nchars = vsnprintf(*buffer, size, format, ap);
   va_end(ap);
 
   if (nchars >= size) {
+    char *tmpbuff;
+    /* reallocate buffer now that we know how much space is needed */
     size = nchars + 1;
     if ((tmpbuff = realloc(*buffer, size)) == NULL) {
+      /* we need to free it */
       free(buffer);
       return -ENOMEM;
     }
     *buffer = tmpbuff;
-
+    /* try again */
     va_start(ap, format);
     nchars = vsnprintf(*buffer, size, format, ap);
     va_end(ap);
