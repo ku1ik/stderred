@@ -20,7 +20,7 @@ static const char CYAN[]    = "\x1b[36m";
 #define COL_RESET_SIZE sizeof(COL_RESET)-1
 
 ssize_t write(int fd, const void* buf, size_t count) {
-  if (fd == 2 && isatty(2)) {
+  if (fd == STDERR_FILENO && isatty(STDERR_FILENO)) {
     struct iovec vec[3] = {
       { (char *)STDERR_COLOR, STDERR_COLOR_SIZE },
       { (char *)buf, count },
