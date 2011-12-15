@@ -19,6 +19,11 @@ static const char CYAN[]    = "\x1b[36m";
 #define STDERR_COLOR_SIZE sizeof(STDERR_COLOR)-1
 #define COL_RESET_SIZE sizeof(COL_RESET)-1
 
+void _reset() {
+  struct iovec vec = { (char *)COL_RESET, COL_RESET_SIZE };
+  writev(STDERR_FILENO, &vec, 1);
+}
+
 ssize_t write(int fd, const void* buf, size_t count) {
   if (fd == STDERR_FILENO && isatty(STDERR_FILENO)) {
     struct iovec vec[3] = {
@@ -28,13 +33,28 @@ ssize_t write(int fd, const void* buf, size_t count) {
     };
 
     ssize_t written = writev(fd, vec, sizeof(vec) / sizeof(vec[0]));
-    if (written < 0)
-      return written;
-    else if (written <= STDERR_COLOR_SIZE)
-      return 0;
 
-    written -= (STDERR_COLOR_SIZE + COL_RESET_SIZE);
-    return written >= count ? count : written;
+    if (written <= 0)
+      return written;
+
+    if (written <= STDERR_COLOR_SIZE) {
+      _reset();
+      return 0;
+    }
+
+    written -= STDERR_COLOR_SIZE;
+
+    if (written <= count) {
+      _reset();
+      return written;
+    }
+
+    written -= count;
+
+    if (written < COL_RESET_SIZE)
+      _reset();
+
+    return count;
   }
   else {
     struct iovec vec = { (char *)buf, count };
