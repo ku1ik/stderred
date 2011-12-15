@@ -24,7 +24,7 @@ Clone this repository:
 
 Important: In all cases below make sure that path to `stderred.so` is absolute!
 
-### Linux and FreeBSD 32-bit
+### 32-bit Linux or FreeBSD
 
     $ make lib/stderred.so
 
@@ -33,7 +33,7 @@ in your .bashrc/.zshrc:
 
     export LD_PRELOAD="/absolute/path/to/lib/stderred.so"
 
-### Linux and FreeBSD 64-bit
+### 64-bit Linux or FreeBSD
 
     $ make lib64/stderred.so
 
@@ -66,7 +66,7 @@ and export `LD_PRELOAD` like this in your shell's config:
 
     export LD_PRELOAD="/path/to/stderred/\$LIB/stderred.so"
 
-### OSX 64-bit
+### OSX
 
     $ make both
     $ lipo -create lib/stderred.so lib64/stderred.so -output lib/stderred.dylib
