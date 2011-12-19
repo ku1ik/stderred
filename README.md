@@ -66,6 +66,8 @@ and export `LD_PRELOAD` like this in your shell's config:
 
     export LD_PRELOAD="/path/to/stderred/\$LIB/stderred.so"
 
+_\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gmane.org/gmane.comp.lib.glibc.user/974)._
+
 ### OSX
 
     $ make both
