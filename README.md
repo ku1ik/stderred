@@ -78,6 +78,10 @@ in your .bashrc/.zshrc:
 
     export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/stderred.dylib DYLD_FORCE_FLAT_NAMESPACE=1
 
+**Note:** Installing on OS X will break the `open` command line utility. So
+things like `mvim` and `open` itself will not work unless the application being
+opened is already opened.
+
 ### Aliasing
 
 Alternative to enabling it globally via shell config is to create alias and
