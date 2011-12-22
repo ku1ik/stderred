@@ -5,30 +5,22 @@
 #include <sys/uio.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <dlfcn.h>
 
 #undef write
-
-#undef fwrite
-#undef fprintf
-#undef fputs
 #undef fputc
-
-#ifdef INCLUDE_UNLOCKED
-  #undef fwrite_unlocked
-  #undef fprintf_unlocked
-  #undef fputs_unlocked
-  #undef fputc_unlocked
-#endif
-
-#if INCLUDE_ERROR
-  #undef perror
-  #undef error
-  #undef error_at_line
-#endif
+#undef fputs
+#undef fprintf
+#undef fwrite
+#undef fputc_unlocked
+#undef fputs_unlocked
+#undef fprintf_unlocked
+#undef fwrite_unlocked
+#undef perror
+#undef error
+#undef error_at_line
 
 #ifndef __USE_GNU
-int asprintf(char **, char *, ...);
-
 #define vasprintf(buffer, format, ap)                       \
 ({                                                          \
   int ret = 0;                                              \
@@ -82,204 +74,215 @@ static const char CYAN[]    = "\x1b[36m";
 
 extern char *program_invocation_name;
 
+void _reset() {
+  struct iovec vec = { (char *)COL_RESET, COL_RESET_SIZE };
+  writev(STDERR_FILENO, &vec, 1);
+}
+
 ssize_t write(int fd, const void* buf, size_t count) {
-  if (fd == STDERR_FILENO && isatty(fd)) {
+  static ssize_t (*x_write)(int, const void *, size_t);
+  if (!x_write)
+    *(void **)(&x_write) = dlsym(RTLD_NEXT, "write");
+  if (!x_write)
+    return ENOSYS;
+
+  if (fd != STDERR_FILENO || !isatty(fd))
+      return x_write(fd, buf, count);
+
+  {
     struct iovec vec[3] = {
       { (char *)STDERR_COLOR, STDERR_COLOR_SIZE },
       { (char *)buf, count },
       { (char *)COL_RESET, COL_RESET_SIZE }
     };
-
     ssize_t written = writev(fd, vec, sizeof(vec) / sizeof(vec[0]));
-    fsync(fd);
-    if (written < 0)
+    if (written <= 0)
       return written;
-    else if (written <= STDERR_COLOR_SIZE)
+    if (written <= STDERR_COLOR_SIZE) {
+      _reset();
       return 0;
-
-    written -= (STDERR_COLOR_SIZE + COL_RESET_SIZE);
-    return written >= count ? count : written;
-  }
-  else {
-    struct iovec vec = { (char *)buf, count };
-    return writev(fd, &vec, 1);
+    }
+    written -= STDERR_COLOR_SIZE;
+    if (written <= count) {
+      _reset();
+      return written;
+    }
+    written -= count;
+    if (written < COL_RESET_SIZE)
+      _reset();
+    return count;
   }
 }
 
-#if 0
-size_t fwrite(const void *data, size_t size, size_t count, FILE *stream) {
-    size_t e = 0;
-    //flockfile(stream);
-    e = write(fileno(stream), data, size * count);
-    //funlockfile(stream);
-    return e == size * count ? count : e;
+/*
+ * standard stream output functions
+ */
+
+int fputc(int chr, FILE *stream) {
+  static int (*x_fputc)(int, FILE *);
+  if (!x_fputc)
+    *(void **)(&x_fputc) = dlsym(RTLD_NEXT, "fputc");
+  if (!x_fputc)
+    return EOF;
+
+  if (stream != stderr)
+    return x_fputc(chr, stream);
+
+  {
+    const unsigned char c[] = { (unsigned char)chr };
+    return (write(fileno(stream), c, sizeof c) == sizeof c) ? chr : EOF;
+  }
 }
-#endif
+
+int fputs(const char *str, FILE *stream) {
+  static int (*x_fputs)(const char *, FILE *);
+  if (!x_fputs)
+    *(void **)(&x_fputs) = dlsym(RTLD_NEXT, "fputs");
+  if (!x_fputs)
+    return EOF;
+
+  if (stream != stderr)
+    return x_fputs(str, stream);
+
+  {
+    const size_t len = strlen(str);
+    return (write(fileno(stream), str, len) == len) ? len : EOF;
+  }
+}
 
 int fprintf(FILE *stream, const char *format, ...) {
-  int e = 0;
+  static int (*x_fprintf)(FILE *, const char *, ...);
+  char *buf = NULL;
+  int err;
   va_list args;
+
+  if (!x_fprintf)
+    *(void **)(&x_fprintf) = dlsym(RTLD_NEXT, "fprintf");
+  if (!x_fprintf)
+    return ENOSYS;
+
   va_start(args, format);
-
-  if (stream == stderr) {
-    char *buf = NULL;
-    vasprintf(&buf, format, args);
-    e = write(fileno(stream), buf, strlen(buf));
-    free(buf);
-  }
+  vasprintf(&buf, format, args);
+  if (stream != stderr)
+    err = x_fprintf(stream, buf);
   else
-    e = vfprintf(stream, format, args);
-
+    err = write(fileno(stream), buf, strlen(buf));
+  free(buf);
   va_end(args);
-  return e;
+  return err;
 }
 
-int fputs(const char *s, FILE *stream) {
-    int e = fprintf(stream, "%s", s);
-    return e < 0 ? EOF : e;
+size_t fwrite(const void *data, size_t size, size_t count, FILE *stream) {
+  static size_t (*x_fwrite)(const void *, size_t, size_t, FILE *);
+  if (!x_fwrite)
+    *(void **)(&x_fwrite) = dlsym(RTLD_NEXT, "fwrite");
+  if (!x_fwrite)
+    return ENOSYS;
+
+  if (stream != stderr)
+    return x_fwrite(data, size, count, stream);
+
+  return write(fileno(stream), data, size * count);
 }
 
-int fputc(int c, FILE *stream) {
-    int e = fprintf(stream, "%c", (char)c) < 0 ? EOF : c;
-    return e;
+/*
+ * "unlocked" stream output functions
+ */
+
+int fputc_unlocked(int chr, FILE *stream) {
+  static int (*x_fputc_unlocked)(int, FILE *);
+  if (!x_fputc_unlocked)
+    *(void **)(&x_fputc_unlocked) = dlsym(RTLD_NEXT, "fputc_unlocked");
+  if (!x_fputc_unlocked)
+    return EOF;
+
+  if (stream != stderr)
+    return x_fputc_unlocked(chr, stream);
+
+  {
+    const unsigned char c[] = { (unsigned char)chr };
+    return (write(fileno_unlocked(stream), c, sizeof c) == sizeof c) ? chr : EOF;
+  }
 }
 
+int fputs_unlocked(const char *str, FILE *stream) {
+  static int (*x_fputs_unlocked)(const char *, FILE *);
+  if (!x_fputs_unlocked)
+    *(void **)(&x_fputs_unlocked) = dlsym(RTLD_NEXT, "fputs_unlocked");
+  if (!x_fputs_unlocked)
+    return EOF;
 
-#ifdef INCLUDE_UNLOCKED
-#if 0
-size_t fwrite_unlocked(const void *data, size_t size, size_t count, FILE *stream) {
-    size_t e = write(fileno_unlocked(stream), data, size * count);
-    return e == size * count ? count : e;
+  if (stream != stderr)
+    return x_fputs_unlocked(str, stream);
+
+  {
+    const size_t len = strlen(str);
+    return (write(fileno_unlocked(stream), str, len) == len) ? len : EOF;
+  }
 }
-#endif
 
 int fprintf_unlocked(FILE *stream, const char *format, ...) {
-  int e = 0;
+  static int (*x_fprintf_unlocked)(FILE *, const char *, ...);
+  char *buf = NULL;
+  int err;
   va_list args;
+
+  if (!x_fprintf_unlocked)
+    *(void **)(&x_fprintf_unlocked) = dlsym(RTLD_NEXT, "fprintf_unlocked");
+  if (!x_fprintf_unlocked)
+    return ENOSYS;
+
   va_start(args, format);
-
-  if (stream == stderr) {
-    char *buf = NULL;
-    vasprintf(&buf, format, args);
-    e = write(fileno_unlocked(stream), buf, strlen(buf));
-    free(buf);
-  }
+  vasprintf(&buf, format, args);
+  if (stream != stderr)
+    err = x_fprintf_unlocked(stream, buf);
   else
-    e = vfprintf(stream, format, args);
-
+    err = write(fileno_unlocked(stream), buf, strlen(buf));
+  free(buf);
   va_end(args);
-  return e;
+  return err;
 }
 
-int fputs_unlocked(const char *s, FILE* stream) {
-    int e = fprintf_unlocked(stream, "%s", s);
-    return e < 0 ? EOF : e;
+size_t fwrite_unlocked(const void *data, size_t size, size_t count, FILE *stream) {
+  static size_t (*x_fwrite_unlocked)(const void *, size_t, size_t, FILE *);
+  if (!x_fwrite_unlocked)
+    *(void **)(&x_fwrite_unlocked) = dlsym(RTLD_NEXT, "fwrite_unlocked");
+  if (!x_fwrite_unlocked)
+    return ENOSYS;
+
+  if (stream != stderr)
+    return x_fwrite_unlocked(data, size, count, stream);
+
+  return write(fileno_unlocked(stream), data, size * count);
 }
 
-int fputc_unlocked(int c, FILE *stream) {
-    return fprintf_unlocked(stream, "%c", (char)c) < 0 ? EOF : c;
-}
-#endif
+/*
+ * error reporting functions
+ */
 
-
-#ifdef INCLUDE_ERROR
 void perror(const char *message) {
-    char *buf = NULL;
-    if (message == NULL)
-      asprintf(&buf, "%s\n", strerror(errno));
-    else
-      asprintf(&buf, "%s: %s\n", message, strerror(errno));
-    write(STDERR_FILENO, buf, strlen(buf));
-    free(buf);
+  if (message == NULL)
+    fprintf(stderr, "%s\n", strerror(errno));
+  else
+    fprintf(stderr, "%s: %s\n", message, strerror(errno));
 }
 
 void error(int status, int errnum, const char *format, ...) {
   char *buf = NULL;
-  char *msg = NULL;
   va_list args;
   va_start(args, format);
-
-  vasprintf(&msg, format, args);
-  asprintf(&buf, "%s: %s: %s\n", program_invocation_name, msg, strerror(errnum));
-  write(STDERR_FILENO, buf, strlen(buf));
-
-  free(msg);
+  vasprintf(&buf, format, args);
+  fprintf(stderr, "%s: %s: %s\n", program_invocation_name, buf, strerror(errnum));
   free(buf);
   va_end(args);
 }
 
 void error_at_line(int status, int errnum, const char *fname, unsigned int lineno, const char *format, ...) {
   char *buf = NULL;
-  char *msg = NULL;
   va_list args;
   va_start(args, format);
-
-  vasprintf(&msg, format, args);
-  asprintf(&buf, "%s:%s:%u %s: %s\n", program_invocation_name, fname, lineno, msg, strerror(errnum));
-  write(STDERR_FILENO, buf, strlen(buf));
-
-  free(msg);
+  vasprintf(&buf, format, args);
+  fprintf(stderr, "%s:%s:%u %s: %s\n", program_invocation_name, fname, lineno, buf, strerror(errnum));
   free(buf);
   va_end(args);
 }
-#endif
-
-
-#ifndef __USE_GNU
-/*
- * Copyright (C) 2001 Federico Di Gregorio <fog@debian.org> 
- * Copyright (C) 1991, 1994-1999, 2000, 2001 Free Software Foundation, Inc.
- *
- * This code has been derived from an example in the glibc2 documentation.
- * This file is part of the psycopg module.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2,
- * or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- */
-
-int asprintf(char **buffer, char *format, ...) {
-  /* guess we need no more than 200 chars of space */
-  int size = 200;
-  int nchars;
-  va_list ap;
-
-  if ((*buffer = malloc(size)) == NULL)
-    return -ENOMEM;
-
-  /* try to print in the allocated space */
-  va_start(ap, format);
-  nchars = vsnprintf(*buffer, size, format, ap);
-  va_end(ap);
-
-  if (nchars >= size) {
-    char *tmpbuff;
-    /* reallocate buffer now that we know how much space is needed */
-    size = nchars + 1;
-    if ((tmpbuff = realloc(*buffer, size)) == NULL) {
-      /* we need to free it */
-      free(buffer);
-      return -ENOMEM;
-    }
-    *buffer = tmpbuff;
-    /* try again */
-    va_start(ap, format);
-    nchars = vsnprintf(*buffer, size, format, ap);
-    va_end(ap);
-  }
-
-  if (nchars < 0)
-    return nchars;
-  return size;
-}
-#endif
