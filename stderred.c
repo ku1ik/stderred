@@ -7,9 +7,14 @@
 #include <errno.h>
 
 #undef write
+#undef fwrite
+#undef fwrite_unlocked
 #undef fprintf
+#undef fprintf_unlocked
 #undef fputs
+#undef fputs_unlocked
 #undef fputc
+#undef fputc_unlocked
 #undef perror
 #undef error
 #undef error_at_line
@@ -92,6 +97,14 @@ ssize_t write(int fd, const void* buf, size_t count) {
     struct iovec vec = { (char *)buf, count };
     return writev(fd, &vec, 1);
   }
+}
+
+size_t fwrite(const void *data, size_t size, size_t count, FILE *stream) {
+    return write(fileno(stream), data, size * count);
+}
+
+size_t fwrite_unlocked(const void *data, size_t size, size_t count, FILE *stream) {
+    return write(fileno(stream), data, size * count);
 }
 
 int fprintf(FILE *stream, const char *format, ...) {
