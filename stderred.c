@@ -7,17 +7,24 @@
 #include <errno.h>
 
 #undef write
+
 #undef fwrite
-#undef fwrite_unlocked
 #undef fprintf
-#undef fprintf_unlocked
 #undef fputs
-#undef fputs_unlocked
 #undef fputc
-#undef fputc_unlocked
-#undef perror
-#undef error
-#undef error_at_line
+
+#ifdef INCLUDE_UNLOCKED
+  #undef fwrite_unlocked
+  #undef fprintf_unlocked
+  #undef fputs_unlocked
+  #undef fputc_unlocked
+#endif
+
+#if INCLUDE_ERROR
+  #undef perror
+  #undef error
+  #undef error_at_line
+#endif
 
 #ifndef __USE_GNU
 int asprintf(char **, char *, ...);
@@ -100,12 +107,19 @@ ssize_t write(int fd, const void* buf, size_t count) {
 }
 
 size_t fwrite(const void *data, size_t size, size_t count, FILE *stream) {
-    return write(fileno(stream), data, size * count);
+    size_t e = 0;
+    flockfile(stream);
+    e = write(fileno(stream), data, size * count);
+    funlockfile(stream);
+    return e == size * count ? count : e;
 }
 
+#ifdef INCLUDE_UNLOCKED
 size_t fwrite_unlocked(const void *data, size_t size, size_t count, FILE *stream) {
-    return write(fileno(stream), data, size * count);
+    size_t e = write(fileno_unlocked(stream), data, size * count);
+    return e == size * count ? count : e;
 }
+#endif
 
 int fprintf(FILE *stream, const char *format, ...) {
   int e = 0;
@@ -115,7 +129,7 @@ int fprintf(FILE *stream, const char *format, ...) {
   if (stream == stderr) {
     char *buf = NULL;
     vasprintf(&buf, format, args);
-    e = write(fileno(stream), buf, strlen(buf));
+    e = fwrite(buf, sizeof( char ), strlen(buf), stream);
     free(buf);
   }
   else
@@ -125,6 +139,7 @@ int fprintf(FILE *stream, const char *format, ...) {
   return e;
 }
 
+#ifdef INCLUDE_UNLOCKED
 int fprintf_unlocked(FILE *stream, const char *format, ...) {
   int e = 0;
   va_list args;
@@ -133,7 +148,7 @@ int fprintf_unlocked(FILE *stream, const char *format, ...) {
   if (stream == stderr) {
     char *buf = NULL;
     vasprintf(&buf, format, args);
-    e = write(fileno_unlocked(stream), buf, strlen(buf));
+    e = fwrite_unlocked(buf, sizeof( char ), strlen(buf), stream);
     free(buf);
   }
   else
@@ -142,24 +157,32 @@ int fprintf_unlocked(FILE *stream, const char *format, ...) {
   va_end(args);
   return e;
 }
+#endif
 
 int fputs(const char *s, FILE *stream) {
     int e = fprintf(stream, "%s", s);
     return e < 0 ? EOF : e;
 }
 
+#ifdef INCLUDE_UNLOCKED
 int fputs_unlocked(const char *s, FILE* stream) {
-    return fputs(s, stream);
+    int e = fprintf_unlocked(stream, "%s", s);
+    return e < 0 ? EOF : e;
 }
+#endif
 
 int fputc(int c, FILE *stream) {
-    return fprintf(stream, "%c", (char)c) < 0 ? EOF : c;
+    int e = fprintf(stream, "%c", (char)c) < 0 ? EOF : c;
+    return e;
 }
 
+#ifdef INCLUDE_UNLOCKED
 int fputc_unlocked(int c, FILE *stream) {
-    return fputc(c, stream);
+    return fprintf_unlocked(stream, "%c", (char)c) < 0 ? EOF : c;
 }
+#endif
 
+#ifdef INCLUDE_ERROR
 void perror(const char *message) {
     char *buf = NULL;
     if (message == NULL)
@@ -199,6 +222,7 @@ void error_at_line(int status, int errnum, const char *fname, unsigned int linen
   free(buf);
   va_end(args);
 }
+#endif
 
 #ifndef __USE_GNU
 /*
