@@ -106,14 +106,15 @@ ssize_t write(int fd, const void* buf, size_t count) {
   }
 }
 
-
-//size_t fwrite(const void *data, size_t size, size_t count, FILE *stream) {
-//    size_t e = 0;
-//    //flockfile(stream);
-//    e = write(fileno(stream), data, size * count);
-//    //funlockfile(stream);
-//    return e == size * count ? count : e;
-//}
+#if 0
+size_t fwrite(const void *data, size_t size, size_t count, FILE *stream) {
+    size_t e = 0;
+    //flockfile(stream);
+    e = write(fileno(stream), data, size * count);
+    //funlockfile(stream);
+    return e == size * count ? count : e;
+}
+#endif
 
 int fprintf(FILE *stream, const char *format, ...) {
   int e = 0;
@@ -145,10 +146,12 @@ int fputc(int c, FILE *stream) {
 
 
 #ifdef INCLUDE_UNLOCKED
+#if 0
 size_t fwrite_unlocked(const void *data, size_t size, size_t count, FILE *stream) {
     size_t e = write(fileno_unlocked(stream), data, size * count);
     return e == size * count ? count : e;
 }
+#endif
 
 int fprintf_unlocked(FILE *stream, const char *format, ...) {
   int e = 0;
