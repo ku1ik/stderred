@@ -80,7 +80,8 @@ in your .bashrc/.zshrc:
 
 **Note:** Installing on OS X will break the `open` command line utility. So
 things like `mvim` and `open` itself will not work unless the application being
-opened is already opened.
+opened is already opened. It's because of flat namespace forced by
+`DYLD_FORCE_FLAT_NAMESPACE` which is required by `DYLD_INSERT_LIBRARIES`.
 
 ### Aliasing
 
