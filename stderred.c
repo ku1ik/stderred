@@ -1,23 +1,16 @@
+#include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <sys/uio.h>
 
 #undef write
 
+static const char RED[]       = "\x1b[31m";
 static const char COL_RESET[] = "\x1b[0m";
-
-/*  Foreground colors are in form of 3x, background are 4x */
-static const char RED[]     = "\x1b[31m";
-static const char GREEN[]   = "\x1b[32m";
-static const char YELLOW[]  = "\x1b[33m";
-static const char BLUE[]    = "\x1b[34m";
-static const char MAGENTA[] = "\x1b[35m";
-static const char CYAN[]    = "\x1b[36m";
-
-#define STDERR_COLOR RED
-
-#define STDERR_COLOR_SIZE sizeof(STDERR_COLOR)-1
 #define COL_RESET_SIZE sizeof(COL_RESET)-1
+
+char *color_code;
+int color_code_size;
 
 void _reset() {
   struct iovec vec = { (char *)COL_RESET, COL_RESET_SIZE };
@@ -25,9 +18,19 @@ void _reset() {
 }
 
 ssize_t write(int fd, const void* buf, size_t count) {
+  if (color_code == NULL) {
+    color_code = getenv("STDERRED_ESC_CODE");
+
+    if (color_code == NULL) {
+      color_code = (char *)RED;
+    }
+
+    color_code_size = strlen(color_code);
+  }
+
   if (fd == STDERR_FILENO && isatty(STDERR_FILENO)) {
     struct iovec vec[3] = {
-      { (char *)STDERR_COLOR, STDERR_COLOR_SIZE },
+      { (char *)color_code, color_code_size },
       { (char *)buf, count },
       { (char *)COL_RESET, COL_RESET_SIZE }
     };
@@ -37,12 +40,12 @@ ssize_t write(int fd, const void* buf, size_t count) {
     if (written <= 0)
       return written;
 
-    if (written <= STDERR_COLOR_SIZE) {
+    if (written <= color_code_size) {
       _reset();
       return 0;
     }
 
-    written -= STDERR_COLOR_SIZE;
+    written -= color_code_size;
 
     if (written <= count) {
       _reset();

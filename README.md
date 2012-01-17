@@ -99,6 +99,18 @@ Jola should be in red dress.
 
 ![stderred in action](https://github.com/downloads/sickill/stderred/stderred.png)
 
+## Configuration
+
+### Custom color code
+
+If you prefer other color or you want to use additional escape codes
+(for bold/bright, italic, different background) you can export
+`STDERRED_ESC_CODE` with desired escape code sequence.
+
+Here's example for bold red:
+
+    export STDERRED_ESC_CODE=`echo -e "\e[1;31m"`
+
 ## Alternative implementations
 
 Simpler and much less reliable solution when using Zsh is to use named pipes
