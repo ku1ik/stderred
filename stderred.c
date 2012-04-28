@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <sys/uio.h>
+#include <sys/stat.h>
 
 #undef write
 
@@ -28,7 +29,10 @@ ssize_t write(int fd, const void* buf, size_t count) {
     color_code_size = strlen(color_code);
   }
 
-  if (fd == STDERR_FILENO && isatty(STDERR_FILENO)) {
+  struct stat sbuf1;
+  struct stat sbuf2;
+
+  if ((fstat(STDERR_FILENO, &sbuf1) == 0) && (fstat(fd, &sbuf2) == 0) && (sbuf1.st_dev == sbuf2.st_dev) && (sbuf1.st_ino == sbuf2.st_ino)) {
     struct iovec vec[3] = {
       { (char *)color_code, color_code_size },
       { (char *)buf, count },
