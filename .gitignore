@@ -1,3 +1,4 @@
 lib/stderred.dylib
 lib/stderred.so
 lib64/stderred.so
+/test

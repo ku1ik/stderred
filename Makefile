@@ -6,5 +6,8 @@ lib64/stderred.so: stderred.c
 
 both: lib/stderred.so lib64/stderred.so
 
+test: test.c
+	gcc -o test test.c
+
 clean:
 	rm -fv lib*/*.so
