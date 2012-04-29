@@ -6,6 +6,9 @@ lib64/stderred.so: stderred.c
 
 both: lib/stderred.so lib64/stderred.so
 
+mac: both
+	lipo -create lib/stderred.so lib64/stderred.so -output lib/libstderred.dylib
+
 test: test.c
 	gcc -o test test.c
 
