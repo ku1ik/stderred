@@ -9,6 +9,16 @@ static const char RED[]       = "\x1b[31m";
 static const char COL_RESET[] = "\x1b[0m";
 #define COL_RESET_SIZE sizeof(COL_RESET)-1
 
+// This macro was taken from
+// http://www.mikeash.com/pyblog/friday-qa-2009-01-30-code-injection.html#comment-3fb6e4b8cf65ec984e7836e2b86a2875
+#define DYLD_INTERPOSE(_replacment,_replacee) \
+__attribute__((used)) static struct{ const void* replacment; const void* replacee; } _interpose_##_replacee \
+__attribute__ ((section ("__DATA,__interpose"))) = { (const void*)(unsigned long)&_replacment, (const void*)(unsigned long)&_replacee };
+
+#ifdef __APPLE__
+  DYLD_INTERPOSE(write, write);
+#endif
+
 char *color_code;
 int color_code_size;
 
