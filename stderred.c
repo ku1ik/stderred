@@ -22,9 +22,9 @@ __attribute__ ((section ("__DATA,__interpose"))) = { (const void*)(unsigned long
 char *color_code;
 int color_code_size;
 
-void _reset() {
-  struct iovec vec = { (char *)COL_RESET, COL_RESET_SIZE };
-  writev(STDERR_FILENO, &vec, 1);
+#define _reset() { \
+  struct iovec vec = { (char *)COL_RESET, COL_RESET_SIZE }; \
+  writev(STDERR_FILENO, &vec, 1); \
 }
 
 ssize_t write(int fd, const void* buf, size_t count) {
