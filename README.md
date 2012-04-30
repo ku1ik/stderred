@@ -76,7 +76,7 @@ _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gma
 Export `DYLD_INSERT_LIBRARIES` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}
+    export DYLD_INSERT_LIBRARIES="/absolute/path/to/lib/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
 
 ### Aliasing
 
