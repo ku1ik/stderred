@@ -161,6 +161,23 @@ int FUNC(fprintf)(FILE *stream, const char *format, ...) {
   return result;
 }
 
+#ifdef HAVE_FPRINTF_UNLOCKED
+int FUNC(fprintf_unlocked)(FILE *stream, const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  char *buf = NULL;
+  int result = -1;
+
+  if ( vasprintf(&buf, format, args) > 0) {
+    result = FUNC(fwrite_unlocked)(buf, sizeof(char), strlen(buf)/sizeof(char), stream);
+    free(buf);
+  }
+
+  va_end(args);
+  return result;
+}
+#endif
+
 void FUNC(perror)(const char *msg) {
   if (msg == NULL) {
     FUNC(fprintf)(stderr, "%s\n", strerror(errno));
