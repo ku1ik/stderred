@@ -188,11 +188,22 @@ void FUNC(perror)(const char *msg) {
 void FUNC(error)(int status, int errnum, const char *format, ...) {
   GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
   GET_ORIGINAL(void, error, int, int, const char *);
+
   fflush(stdout);
+
   GET_COLOR_CODE();
   if (start_color_code_size > 0)
     ORIGINAL(write)(STDERR_FILENO, start_color_code, start_color_code_size);
-  ORIGINAL(error)(0, errnum, format);
+
+  char *buf;
+  va_list args;
+  va_start(args, format);
+  if ( vasprintf(&buf, format, args) > 0) {
+    ORIGINAL(error)(0, errnum, buf);
+    free(buf);
+  }
+  va_end(args);
+
   RESET();
   if (status) exit(status);
 }
@@ -202,11 +213,22 @@ void FUNC(error)(int status, int errnum, const char *format, ...) {
 void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned int linenum, const char *format, ...) {
   GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
   GET_ORIGINAL(void, error_at_line, int, int, const char *, unsigned int, const char *);
+
   fflush(stdout);
+
   GET_COLOR_CODE();
   if (start_color_code_size > 0)
     ORIGINAL(write)(STDERR_FILENO, start_color_code, start_color_code_size);
-  ORIGINAL(error_at_line)(0, errnum, filename, linenum, format);
+
+  char *buf;
+  va_list args;
+  va_start(args, format);
+  if ( vasprintf(&buf, format, args) > 0) {
+    ORIGINAL(error_at_line)(0, errnum, filename, linenum, buf);
+    free(buf);
+  }
+  va_end(args);
+
   RESET();
   if (status) exit(status);
 }
