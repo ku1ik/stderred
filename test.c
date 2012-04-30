@@ -80,12 +80,12 @@ int main() {
 
 #ifdef HAVE_ERROR
   setup_test();
-  error(0, ENOSYS, "2 error");
+  error(0, ENOSYS, "%s", "2 error");
 #endif
 
 #ifdef HAVE_ERROR_AT_LINE
   setup_test();
-  error_at_line(0, ENOENT, __FILE__, __LINE__, "2 error_at_line");
+  error_at_line(0, ENOENT, __FILE__, __LINE__, "%s", "2 error_at_line");
 #endif
 
   return 0;
