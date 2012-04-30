@@ -1,7 +1,7 @@
 #cmakedefine HAVE_FWRITE_UNLOCKED
 #cmakedefine HAVE_FPUTS_UNLOCKED
 #cmakedefine HAVE_FPUTC_UNLOCKED
-#cmakedefine HAVE_FWRITE_UNLOCKED
+#cmakedefine HAVE_FPRINTF_UNLOCKED
 
 #cmakedefine HAVE_ERROR_H
 #cmakedefine HAVE_ERROR
