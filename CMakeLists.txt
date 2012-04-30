@@ -52,8 +52,14 @@ get_property(stderred_lib_location TARGET stderred PROPERTY LOCATION)
 macro (do_test arg result)
   add_test (${arg} test_runner)
   set_tests_properties(${arg}
-    PROPERTIES PASS_REGULAR_EXPRESSION ${result}
-    ENVIRONMENT "LD_PRELOAD=${stderred_lib_location};DYLD_INSERT_LIBRARIES=${stderred_lib_location}")
+    PROPERTIES PASS_REGULAR_EXPRESSION ${result})
+  if (APPLE)
+    set_tests_properties(${arg}
+      PROPERTIES ENVIRONMENT "DYLD_INSERT_LIBRARIES=${stderred_lib_location}")
+  else (APPLE)
+    set_tests_properties(${arg}
+      PROPERTIES ENVIRONMENT "LD_PRELOAD=${stderred_lib_location}")
+  endif (APPLE)
 endmacro (do_test)
 
 do_test(printf "^1 printf\\n[^<]")

@@ -1,12 +1,12 @@
 #include "config.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <stdarg.h>
-
-int isatty(int fd) {
-  return 1;
-}
+#include <util.h>
+#include <sys/wait.h>
+#include <signal.h>
 
 void test_vfprintf(const char *format, ...) {
   va_list ap;
@@ -15,7 +15,50 @@ void test_vfprintf(const char *format, ...) {
   va_end(ap);
 }
 
+// When our child attacked to the pty exits, we can exit
+void signal_handler(int sig) {
+  if (sig == SIGCHLD) {
+    int status;
+    wait(&status);
+    exit WEXITSTATUS(status);
+  }
+}
+
+// Because we check if the file descriptor is a tty before outputing
+// the terminal escape sequences, we need to fake being a tty through
+// the pseudo ttys.
+void setup_pty() {
+  int child;
+  char pty[512];
+  ssize_t len;
+  fd_set wait;
+  struct winsize win = { .ws_col = 80, .ws_row = 24,
+                         .ws_xpixel = 480, .ws_ypixel = 192 };
+  struct sigaction act;
+  act.sa_handler = signal_handler;
+  act.sa_flags = SA_NOCLDSTOP | SA_RESTART;
+  sigaction(SIGCHLD, &act, 0);
+
+  switch (forkpty(&child, pty, NULL, &win)) {
+    case -1:
+      perror("Failed starting pseudo tty");
+      exit -1;
+    case 0:
+      break;
+    default:
+      FD_ZERO(&wait);
+      FD_SET(child, &wait);
+      while (select(child + 1, &wait, NULL, NULL, NULL) > 0) {
+        len = read(child, pty, sizeof(pty));
+        write(STDOUT_FILENO, pty, len);
+      }
+      exit errno;
+  }
+
+}
+
 int main() {
+  setup_pty();
   setenv("STDERRED_ESC_CODE", ">", 1);
   setenv("STDERRED_END_CODE", "<", 1);
   dup2(STDOUT_FILENO, STDERR_FILENO);
