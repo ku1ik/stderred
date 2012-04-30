@@ -67,7 +67,7 @@ ssize_t FUNC(write)(int fd, const void* buf, size_t count) {
   ssize_t written = ORIGINAL(write)(fd, color_code, color_code_size);
   if (written <= 0) return written;
 
-  if (written <= color_code_size) {
+  if (written < color_code_size) {
     RESET();
     return 0;
   }
