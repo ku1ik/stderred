@@ -6,4 +6,7 @@
 #cmakedefine HAVE_ERROR_H
 #cmakedefine HAVE_ERROR
 #cmakedefine HAVE_ERROR_AT_LINE
-#cmakedefine HAVE_PROGRAM_INVOCATION_NAME
+
+#ifdef HAVE_ERROR_H
+  #include <error.h>
+#endif

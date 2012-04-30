@@ -27,13 +27,6 @@ if (HAVE_GLIBC)
 endif (HAVE_GLIBC)
 
 include(CheckIncludeFiles)
-macro(CHECK_INCLUDE_FILE_CONCAT FILE VARIABLE)
-  CHECK_INCLUDE_FILES("${USE_INCLUDES};${FILE}" ${VARIABLE})
-  if (${VARIABLE})
-    set(USE_INCLUDES ${USE_INCLUDES} ${FILE})
-  endif (${VARIABLE})
-endmacro(CHECK_INCLUDE_FILE_CONCAT FILE VARIABLE)
-
 check_include_files(error.h HAVE_ERROR_H)
 
 include(CheckFunctionExists)
@@ -43,9 +36,6 @@ check_function_exists(fputc_unlocked HAVE_FPUTC_UNLOCKED)
 check_function_exists(fwrite_unlocked HAVE_FWRITE_UNLOCKED)
 check_function_exists(error HAVE_ERROR)
 check_function_exists(error_at_line HAVE_ERROR_AT_LINE)
-
-include(CheckSymbolExists)
-check_symbol_exists(program_invocation_name "errno.h" HAVE_PROGRAM_INVOCATION_NAME)
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/config.h.in"
