@@ -216,9 +216,27 @@ void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned 
 #ifdef DYLD_INTERPOSE
   DYLD_INTERPOSE(FUNC(write), write);
   DYLD_INTERPOSE(FUNC(fputc), fputc);
+#ifdef HAVE_FPUTC_UNLOCKED
+  DYLD_INTERPOSE(FUNC(fputc_unlocked), fputc);
+#endif
   DYLD_INTERPOSE(FUNC(fputs), fputs);
+#ifdef HAVE_FPUTS_UNLOCKED
+  DYLD_INTERPOSE(FUNC(fputs_unlocked), fputs);
+#endif
   DYLD_INTERPOSE(FUNC(fprintf), fprintf);
+#ifdef HAVE_FPRINTF_UNLOCKED
+  DYLD_INTERPOSE(FUNC(fprintf_unlocked), fprintf);
+#endif
   DYLD_INTERPOSE(FUNC(fwrite), fwrite);
+#ifdef HAVE_FWRITE_UNLOCKED
+  DYLD_INTERPOSE(FUNC(fwrite_unlocked), fwrite);
+#endif
   DYLD_INTERPOSE(FUNC(vfprintf), vfprintf);
   DYLD_INTERPOSE(FUNC(perror), perror);
+#ifdef HAVE_ERROR
+  DYLD_INTERPOSE(FUNC(error), perror);
+#endif
+#ifdef HAVE_ERROR_AT_LINE
+  DYLD_INTERPOSE(FUNC(error_at_line), perror);
+#endif
 #endif
