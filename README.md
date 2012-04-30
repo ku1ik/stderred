@@ -26,20 +26,17 @@ Important: In all cases below make sure that path to `stderred.so` is absolute!
 
 ### Building
 
-    $ mkdir build && cd build
-    $ cmake ..
     $ make
 
 Export `LD_PRELOAD` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
     export
-    LD_PRELOAD="/absolute/path/to/lib/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+    LD_PRELOAD="/absolute/path/to/stderred/build/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
 ### Multi-Arch Linux or FreeBSD
 
-    $ mkdir lib && cd lib && CFLAGS='-m32' cmake .. && make && cd ..
-    $ mkdir lib64 && cd lib64 && CFLAGS='-m64' cmake .. && make
+    $ make 32 && make 64
 
 On some Linux distros you can install 32-bit packages on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
@@ -76,9 +73,7 @@ in your .bashrc/.zshrc:
 
 ### Universal lib on OSX
 
-    $ mkdir build && cd build
-    $ cmake .. -DCMAKE_OSX_ARCHITECTURES="x86_64;i386"
-    $ make
+    $ make universal
 
 ### Aliasing
 

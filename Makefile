@@ -1,16 +1,25 @@
-lib/stderred.so: stderred.c
-	gcc stderred.c -D_GNU_SOURCE -Wall -ldl -fPIC -m32 -shared -o lib/stderred.so
+all: test
 
-lib64/stderred.so: stderred.c
-	gcc stderred.c -D_GNU_SOURCE -Wall -ldl -fPIC -m64 -shared -o lib64/stderred.so
+build: clean
+	mkdir build && cd build && cmake .. && make
 
-both: lib/stderred.so lib64/stderred.so
+32: clean32
+	mkdir lib && cd lib && CFLAGS='-m32' cmake .. && make && make test
 
-mac: both
-	lipo -create lib/stderred.so lib64/stderred.so -output lib/libstderred.dylib
+clean32:
+	rm -rf lib32
 
-test: test.c
-	gcc -o test test.c
+64: clean64
+	mkdir lib64 && cd lib64 && CFLAGS='-m64' cmake .. && make && make test
+
+universal: clean
+	mkdir build && cd build && cmake .. -DCMAKE_OSX_ARCHITECTURES="x86_64;i386" && make && make test
+
+clean64:
+	rm -rf lib64
+
+test: build
+	cd build && make test
 
 clean:
-	rm -fv lib*/*.so
+	rm -rf build
