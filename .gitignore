@@ -1,4 +1,1 @@
-lib/libstderred.dylib
-lib/stderred.so
-lib64/stderred.so
-/test
+build/
