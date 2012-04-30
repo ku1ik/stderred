@@ -31,8 +31,7 @@ Important: In all cases below make sure that path to `stderred.so` is absolute!
 Export `LD_PRELOAD` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export
-    LD_PRELOAD="/absolute/path/to/stderred/build/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+    export LD_PRELOAD="/absolute/path/to/stderred/build/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
 ### Multi-Arch Linux or FreeBSD
 
