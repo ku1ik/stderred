@@ -41,7 +41,7 @@ int main() {
 
 #ifdef HAVE_FPUTC_UNLOCKED
   fputc_unlocked(0x32, stderr); fflush(stderr);
-  printf(" <= fputc\n"); fflush(stdout);
+  printf(" <= fputc_unlocked\n"); fflush(stdout);
 #endif
 
   fputs("2 fputs\n", stderr);

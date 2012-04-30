@@ -124,6 +124,13 @@ int FUNC(fputc)(int chr, FILE *stream) {
   return FUNC(fwrite)(c, sizeof(char), sizeof(char), stream);
 }
 
+#ifdef HAVE_FPUTC_UNLOCKED
+int FUNC(fputc_unlocked)(int chr, FILE *stream) {
+  const unsigned char c[] = { (unsigned char)chr };
+  return FUNC(fwrite_unlocked)(c, sizeof(char), sizeof(char), stream);
+}
+#endif
+
 int FUNC(fputs)(const char *str, FILE *stream) {
   return FUNC(fwrite)(str, sizeof(char), strlen(str)/sizeof(char), stream);
 }
