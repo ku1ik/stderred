@@ -24,24 +24,22 @@ Clone this repository:
 
 Important: In all cases below make sure that path to `stderred.so` is absolute!
 
-### 32-bit Linux or FreeBSD
+### Building
 
-    $ make lib/stderred.so
+    $ mkdir build && cd build
+    $ cmake ..
+    $ make
 
 Export `LD_PRELOAD` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
     export
-    LD_PRELOAD="/absolute/path/to/lib/stderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+    LD_PRELOAD="/absolute/path/to/lib/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
-### 64-bit Linux or FreeBSD
+### Multi-Arch Linux or FreeBSD
 
-    $ make lib64/stderred.so
-
-Export `LD_PRELOAD` variable in your shell's config file by putting following
-in your .bashrc/.zshrc:
-
-    export LD_PRELOAD="/absolute/path/to/lib64/stderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+    $ mkdir lib && cd lib && CFLAGS='-m32' cmake .. && make && cd ..
+    $ mkdir lib64 && cd lib64 && CFLAGS='-m64' cmake .. && make
 
 On some Linux distros you can install 32-bit packages on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
@@ -71,19 +69,23 @@ _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gma
 
 ### OSX
 
-    $ make mac
-
 Export `DYLD_INSERT_LIBRARIES` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export DYLD_INSERT_LIBRARIES="/absolute/path/to/lib/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
+    export DYLD_INSERT_LIBRARIES="/absolute/path/to/build/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
+
+### Universal lib on OSX
+
+    $ mkdir build && cd build
+    $ cmake .. -DCMAKE_OSX_ARCHITECTURES="x86_64;i386"
+    $ make
 
 ### Aliasing
 
 Alternative to enabling it globally via shell config is to create alias and
 use it to selectively colorize stderr for the commands you run:
 
-    $ alias stderred="LD_PRELOAD=/absolute/path/to/lib/stderred.so\${LD_PRELOAD:+:\$LD_PRELOAD}"
+    $ alias stderred="LD_PRELOAD=/absolute/path/to/build/libstderred.so\${LD_PRELOAD:+:\$LD_PRELOAD}"
     $ stderred java lol
 
 ### Checking if it works
@@ -107,6 +109,11 @@ Here's example for bold red:
 
     export STDERRED_ESC_CODE=`echo -e "\e[1;31m"`
 
+If you want to go crazy you can even use `STDERRED_END_CODE` to insert
+something other than the color reset code at the end of the stderr stream. This
+isn't advised though because it prevents you from easily telling stderr apart
+from stdout. Wasn't that the whole point of stderred?
+
 ## Alternative implementations
 
 Simpler and much less reliable solution when using Zsh is to use named pipes
@@ -126,6 +133,7 @@ Current implementation:
 
 * Marcin Kulik
 * Brian Tarricone
+* Chris Hoffman
 
 ## License
 
