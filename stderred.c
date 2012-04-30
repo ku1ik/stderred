@@ -81,6 +81,26 @@ ssize_t FUNC(write)(int fd, const void* buf, size_t count) {
   return written;
 }
 
+#ifdef HAVE_FWRITE_UNLOCKED
+size_t FUNC(fwrite_unlocked)(const void *data, size_t size, size_t count, FILE *stream) {
+  ssize_t result;
+  int is_stderr = stream == stderr && isatty(fileno_unlocked(stream)) ? 1 : 0;
+
+  GET_ORIGINAL(ssize_t, fwrite_unlocked, const void*, size_t, size_t, FILE *);
+  GET_COLOR_CODE();
+
+  if (is_stderr && start_color_code_size > 0 && size * count > 0) {
+    result = ORIGINAL(fwrite_unlocked)(start_color_code, sizeof(char), start_color_code_size, stream);
+    if (result < 0) return result;
+  }
+
+  result = ORIGINAL(fwrite_unlocked)(data, size, count, stream);
+  if (result > 0 && is_stderr && start_color_code_size > 0 && end_color_code_size > 0)
+    ORIGINAL(fwrite_unlocked)(end_color_code, sizeof(char), end_color_code_size, stream);
+  return result;
+}
+#endif
+
 size_t FUNC(fwrite)(const void *data, size_t size, size_t count, FILE *stream) {
   ssize_t result;
   int is_stderr = stream == stderr && isatty(fileno(stream)) ? 1 : 0;
