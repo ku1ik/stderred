@@ -22,8 +22,3 @@ extern size_t start_color_code_size;
 
 extern char *end_color_code;
 extern size_t end_color_code_size;
-
-#ifndef __APPLE__
-#include <dlfcn.h>
-#endif
-
