@@ -58,8 +58,8 @@ int color_code_size;
 ssize_t FUNC(write)(int fd, const void* buf, size_t count) {
   GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
 
-  if (fd != STDERR_FILENO || !isatty(STDERR_FILENO)) {
-    ORIGINAL(write)(fd, buf, count);
+  if (fd != STDERR_FILENO || !isatty(fd)) {
+    return ORIGINAL(write)(fd, buf, count);
   }
 
   GET_COLOR_CODE();
