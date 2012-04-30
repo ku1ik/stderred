@@ -31,7 +31,8 @@ Important: In all cases below make sure that path to `stderred.so` is absolute!
 Export `LD_PRELOAD` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export LD_PRELOAD="/absolute/path/to/lib/stderred.so"
+    export
+    LD_PRELOAD="/absolute/path/to/lib/stderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
 ### 64-bit Linux or FreeBSD
 
@@ -40,7 +41,7 @@ in your .bashrc/.zshrc:
 Export `LD_PRELOAD` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export LD_PRELOAD="/absolute/path/to/lib64/stderred.so"
+    export LD_PRELOAD="/absolute/path/to/lib64/stderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
 On some Linux distros you can install 32-bit packages on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
@@ -64,7 +65,7 @@ compile it like this:
 
 and export `LD_PRELOAD` like this in your shell's config:
 
-    export LD_PRELOAD="/path/to/stderred/\$LIB/stderred.so"
+    export LD_PRELOAD="/path/to/stderred/\$LIB/stderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
 _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gmane.org/gmane.comp.lib.glibc.user/974)._
 
@@ -75,14 +76,14 @@ _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gma
 Export `DYLD_INSERT_LIBRARIES` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/libstderred.dylib
+    export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}
 
 ### Aliasing
 
 Alternative to enabling it globally via shell config is to create alias and
 use it to selectively colorize stderr for the commands you run:
 
-    $ alias stderred='LD_PRELOAD=/absolute/path/to/lib/stderred.so'
+    $ alias stderred="LD_PRELOAD=/absolute/path/to/lib/stderred.so\${LD_PRELOAD:+:\$LD_PRELOAD}"
     $ stderred java lol
 
 ### Checking if it works
