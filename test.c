@@ -11,6 +11,9 @@ void test_vfprintf(const char *format, ...) {
 }
 
 int main() {
+  setenv("STDERRED_ESC_CODE", ">", 1);
+  setenv("STDERRED_END_CODE", "<", 1);
+
   printf("[1] printf\n");
   write(2, "[2] write\n", 11);
   fprintf(stderr, "[2] fprintf\n");
