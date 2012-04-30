@@ -136,6 +136,33 @@ void FUNC(perror)(const char *msg) {
   }
 }
 
+
+#ifdef HAVE_ERROR
+void FUNC(error)(int status, int errnum, const char *format, ...) {
+  GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
+  GET_ORIGINAL(void, error, int, int, const char *);
+  fflush(stdout);
+  if (start_color_code_size > 0)
+    ORIGINAL(write)(STDERR_FILENO, start_color_code, start_color_code_size);
+  ORIGINAL(error)(0, errnum, format);
+  RESET();
+  if (status) exit(status);
+}
+#endif
+
+#ifdef HAVE_ERROR_AT_LINE
+void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned int linenum, const char *format, ...) {
+  GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
+  GET_ORIGINAL(void, error_at_line, int, int, const char *, unsigned int, const char *);
+  fflush(stdout);
+  if (start_color_code_size > 0)
+    ORIGINAL(write)(STDERR_FILENO, start_color_code, start_color_code_size);
+  ORIGINAL(error_at_line)(0, errnum, filename, linenum, format);
+  RESET();
+  if (status) exit(status);
+}
+#endif
+
 #ifdef DYLD_INTERPOSE
   DYLD_INTERPOSE(FUNC(write), write);
   DYLD_INTERPOSE(FUNC(fputc), fputc);
