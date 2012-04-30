@@ -118,20 +118,11 @@ int FUNC(fprintf)(FILE *stream, const char *format, ...) {
   return result;
 }
 
-
-static void vperror(const char *format, ...) {
-  va_list ap;
-  va_start(ap, format);
-  FUNC(vfprintf)(stderr, format, ap);
-  va_end(ap);
-}
-
-
 void FUNC(perror)(const char *msg) {
   if (msg == NULL) {
-    vperror("%s\n", strerror(errno));
+    FUNC(fprintf)(stderr, "%s\n", strerror(errno));
   } else {
-    vperror("%s: %s\n", msg, strerror(errno));
+    FUNC(fprintf)(stderr, "%s: %s\n", msg, strerror(errno));
   }
 }
 
@@ -144,4 +135,3 @@ void FUNC(perror)(const char *msg) {
   DYLD_INTERPOSE(FUNC(vfprintf), vfprintf);
   DYLD_INTERPOSE(FUNC(perror), perror);
 #endif
-
