@@ -39,21 +39,21 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 add_library(stderred SHARED stderred.c)
-add_executable(test_runner test.c stderred)
+add_executable(test_runner test.c)
 
 if (NOT APPLE)
   target_link_libraries(stderred dl)
-  target_link_libraries(test_runner dl)
 endif(NOT APPLE)
 
 install(TARGETS stderred DESTINATION lib)
 
 include(CTest)
+get_property(stderred_lib_location TARGET stderred PROPERTY LOCATION)
 macro (do_test arg result)
   add_test (${arg} test_runner)
   set_tests_properties(${arg}
     PROPERTIES PASS_REGULAR_EXPRESSION ${result}
-               ENVIRONMENT "LD_PRELOAD=")
+    ENVIRONMENT "LD_PRELOAD=${stderred_lib_location};DYLD_INSERT_LIBRARIES=${stderred_lib_location}")
 endmacro (do_test)
 
 do_test(printf "^1 printf\\n[^<]")
