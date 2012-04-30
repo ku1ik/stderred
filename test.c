@@ -4,9 +4,15 @@
 #include <unistd.h>
 #include <errno.h>
 #include <stdarg.h>
-#include <util.h>
 #include <sys/wait.h>
 #include <signal.h>
+
+#ifdef HAVE_PTY_H
+int isatty(int fd) {
+  return 1;
+}
+#define setup_pty()
+#endif
 
 void test_vfprintf(const char *format, ...) {
   va_list ap;
@@ -14,6 +20,14 @@ void test_vfprintf(const char *format, ...) {
   vfprintf(stderr, format, ap);
   va_end(ap);
 }
+
+
+// Complete hackery debauchery but I'm done fighting with assanine tty
+// excentricies to make my tests output results to the test runner. On
+// BSD based system we'll make an actual pty and on GLIBC we'll just fake
+// the isatty function call;
+#ifdef HAVE_UTIL_H
+#include <util.h>
 
 // When our child attacked to the pty exits, we can exit
 void signal_handler(int sig) {
@@ -30,7 +44,7 @@ void signal_handler(int sig) {
 void setup_pty() {
   int child;
   char pty[512];
-  ssize_t len;
+  size_t len;
   fd_set wait;
   struct winsize win = { .ws_col = 80, .ws_row = 24,
                          .ws_xpixel = 480, .ws_ypixel = 192 };
@@ -39,7 +53,7 @@ void setup_pty() {
   act.sa_flags = SA_NOCLDSTOP | SA_RESTART;
   sigaction(SIGCHLD, &act, 0);
 
-  switch (forkpty(&child, pty, NULL, &win)) {
+  switch (forkpty(&child, NULL, NULL, &win)) {
     case -1:
       perror("Failed starting pseudo tty");
       exit -1;
@@ -49,13 +63,33 @@ void setup_pty() {
       FD_ZERO(&wait);
       FD_SET(child, &wait);
       while (select(child + 1, &wait, NULL, NULL, NULL) > 0) {
-        len = read(child, pty, sizeof(pty));
-        write(STDOUT_FILENO, pty, len);
+        do {
+          len = read(child, pty, sizeof(pty));
+        } while (len < 0 && len == EINTR);
+
+        if (len == 0) break;
+
+        size_t total = 0, written = 0;
+        while (len > 0) {
+          do {
+            written = write(STDOUT_FILENO, pty + total, len);
+          } while (written < 0 && written == EINTR);
+
+          if (written == (size_t)-1) break;
+          if (written == 0) {
+            errno = ENOSPC;
+            break;
+          }
+
+          total += written;
+          len -= written;
+        }
       }
       exit errno;
   }
 
 }
+#endif
 
 int main() {
   setup_pty();

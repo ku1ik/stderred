@@ -7,6 +7,9 @@
 #cmakedefine HAVE_ERROR
 #cmakedefine HAVE_ERROR_AT_LINE
 
+#cmakedefine HAVE_PTY_H
+#cmakedefine HAVE_UTIL_H
+
 #ifdef HAVE_ERROR_H
   #include <error.h>
 #endif
