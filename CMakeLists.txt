@@ -20,8 +20,6 @@ endif (HAVE_GLIBC)
 
 include(CheckIncludeFiles)
 check_include_files(error.h HAVE_ERROR_H)
-check_include_files(pty.h HAVE_PTY_H)
-check_include_files(util.h HAVE_UTIL_H)
 
 include(CheckFunctionExists)
 check_function_exists(fwrite_unlocked HAVE_FWRITE_UNLOCKED)
@@ -41,12 +39,8 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 add_library(stderred SHARED stderred.c)
+add_library(test_stderred SHARED test_tty.c stderred.c)
 add_executable(test_runner test.c)
-
-# For forkpty on glibc which doesn't work like I want... ugh
-# if (HAVE_PTY_H)
-#   target_link_libraries(test_runner util)
-# endif (HAVE_PTY_H)
 
 if (NOT APPLE)
   target_link_libraries(stderred dl)
@@ -55,7 +49,7 @@ endif(NOT APPLE)
 install(TARGETS stderred DESTINATION lib)
 
 include(CTest)
-get_property(stderred_lib_location TARGET stderred PROPERTY LOCATION)
+get_property(stderred_lib_location TARGET test_stderred PROPERTY LOCATION)
 macro (do_test arg result)
   add_test (${arg} test_runner)
   set_tests_properties(${arg}
