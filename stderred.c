@@ -80,7 +80,7 @@ ssize_t FUNC(write)(int fd, const void* buf, size_t count) {
   return written;
 }
 
-ssize_t FUNC(fwrite)(const void *data, size_t size, size_t count, FILE *stream) {
+size_t FUNC(fwrite)(const void *data, size_t size, size_t count, FILE *stream) {
   ssize_t result;
   int is_stderr = stream == stderr && isatty(fileno(stream)) ? 1 : 0;
 
