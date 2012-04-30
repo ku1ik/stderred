@@ -41,11 +41,11 @@ int main() {
   write(2, "2 write\n", 8);
 
   setup_test();
-  fprintf(stderr, "2 fprintf\n");
+  fprintf(stderr, "%s", "2 fprintf\n");
 
 #ifdef HAVE_FPRINTF_UNLOCKED
   setup_test();
-  fprintf_unlocked(stderr, "2 fprintf_unlocked\n");
+  fprintf_unlocked(stderr, "%s", "2 fprintf_unlocked\n");
 #endif
 
   setup_test();
