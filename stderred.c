@@ -64,16 +64,19 @@ ssize_t FUNC(write)(int fd, const void* buf, size_t count) {
 
   GET_COLOR_CODE();
 
-  ssize_t written = ORIGINAL(write)(fd, color_code, color_code_size);
-  if (written <= 0) return written;
+  ssize_t written;
+  if (color_code_size > 0) {
+    written = ORIGINAL(write)(fd, color_code, color_code_size);
+    if (written <= 0) return written;
 
-  if (written < color_code_size) {
-    RESET();
-    return 0;
+    if (written < color_code_size) {
+      RESET();
+      return 0;
+    }
   }
 
   written = ORIGINAL(write)(fd, buf, count);
-  if (written > 0) RESET();
+  if (written > 0 && color_code_size > 0) RESET();
   return written;
 }
 
