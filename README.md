@@ -88,6 +88,7 @@ use it to selectively colorize stderr for the commands you run:
 ### Checking if it works
 
     $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
+    $ ruby -e 'puts "Yo!"; warn "Jola"'
 
 Jola should be in red dress.
 
