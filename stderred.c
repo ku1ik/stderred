@@ -94,7 +94,7 @@ int FUNC(fputc)(int chr, FILE *stream) {
   return FUNC(fwrite)(c, sizeof(char), sizeof(char), stream);
 }
 
-int _fputs(const char *str, FILE *stream) {
+int FUNC(fputs)(const char *str, FILE *stream) {
   return FUNC(fwrite)(str, sizeof(char), strlen(str)/sizeof(char), stream);
 }
 
