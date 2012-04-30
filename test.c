@@ -47,7 +47,7 @@ int main() {
   fputs("2 fputs\n", stderr);
 
 #ifdef HAVE_FPUTS_UNLOCKED
-  fputs_unlocked("2 fputs\n", stderr);
+  fputs_unlocked("2 fputs_unlocked\n", stderr);
 #endif
 
   test_vfprintf("2 %s\n", "vfprintf");

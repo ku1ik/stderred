@@ -135,6 +135,12 @@ int FUNC(fputs)(const char *str, FILE *stream) {
   return FUNC(fwrite)(str, sizeof(char), strlen(str)/sizeof(char), stream);
 }
 
+#ifdef HAVE_FPUTS_UNLOCKED
+int FUNC(fputs_unlocked)(const char *str, FILE *stream) {
+  return FUNC(fwrite_unlocked)(str, sizeof(char), strlen(str)/sizeof(char), stream);
+}
+#endif
+
 int FUNC(vfprintf)(FILE *stream, const char *format, va_list ap) {
   char *buf = NULL;
 
