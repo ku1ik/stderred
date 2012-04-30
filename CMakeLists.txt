@@ -44,6 +44,7 @@ add_executable(test_runner test.c)
 
 if (NOT APPLE)
   target_link_libraries(stderred dl)
+  target_link_libraries(test_stderred dl)
 endif(NOT APPLE)
 
 install(TARGETS stderred DESTINATION lib)
