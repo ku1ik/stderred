@@ -59,7 +59,7 @@ compile it like this:
 
 and export `LD_PRELOAD` like this in your shell's config:
 
-    export LD_PRELOAD="/path/to/stderred/\$LIB/stderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+    export LD_PRELOAD="/path/to/stderred/\$LIB/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
 _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gmane.org/gmane.comp.lib.glibc.user/974)._
 
