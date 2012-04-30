@@ -82,12 +82,18 @@ ssize_t FUNC(write)(int fd, const void* buf, size_t count) {
 
 ssize_t FUNC(fwrite)(const void *data, size_t size, size_t count, FILE *stream) {
   ssize_t result;
+  int is_stderr = stream == stderr && isatty(fileno(stream)) ? 1 : 0;
+
   GET_ORIGINAL(ssize_t, fwrite, const void*, size_t, size_t, FILE *);
   GET_COLOR_CODE();
-  if (stream == stderr && isatty(STDERR_FILENO))
-    ORIGINAL(fwrite)(color_code, sizeof(char), color_code_size, stream);
+
+  if (is_stderr && color_code_size > 0) {
+    result = ORIGINAL(fwrite)(color_code, sizeof(char), color_code_size, stream);
+    if (result < 0) return result;
+  }
+
   result = ORIGINAL(fwrite)(data, size, count, stream);
-  if (stream == stderr && isatty(STDERR_FILENO))
+  if (result > 0 && is_stderr && color_code_size > 0)
     ORIGINAL(fwrite)(COL_RESET, sizeof(char), COL_RESET_SIZE, stream);
   return result;
 }
