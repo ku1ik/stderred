@@ -39,7 +39,7 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 add_library(stderred SHARED stderred.c)
-add_library(test_stderred SHARED test_tty.c stderred.c)
+add_library(test_stderred SHARED mocks.c stderred.c)
 add_executable(test_runner test.c)
 
 if (NOT APPLE)
