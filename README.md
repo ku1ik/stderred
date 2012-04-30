@@ -70,18 +70,12 @@ _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gma
 
 ### OSX
 
-    $ make both
-    $ lipo -create lib/stderred.so lib64/stderred.so -output lib/stderred.dylib
+    $ make mac
 
 Export `DYLD_INSERT_LIBRARIES` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/stderred.dylib DYLD_FORCE_FLAT_NAMESPACE=1
-
-**Note:** Installing on OS X will break the `open` command line utility. So
-things like `mvim` and `open` itself will not work unless the application being
-opened is already opened. It's because of flat namespace forced by
-`DYLD_FORCE_FLAT_NAMESPACE` which is required by `DYLD_INSERT_LIBRARIES`.
+    export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/libstderred.dylib
 
 ### Aliasing
 
