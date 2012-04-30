@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 project(stderred)
 
-if (!OSX)
-  if (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m64")
-  else (CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -m32")
-  endif (CMAKE_SIZEOF_VOID_P EQUAL 8)
-endif (!OSX)
-
 include(CheckCSourceCompiles)
 check_c_source_compiles("
   #include <features.h>
@@ -47,10 +39,12 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 add_library(stderred SHARED stderred.c)
-target_link_libraries(stderred dl)
-
 add_executable(test_runner test.c stderred)
-target_link_libraries(test_runner dl)
+
+if (NOT APPLE)
+  target_link_libraries(stderred dl)
+  target_link_libraries(test_runner dl)
+endif(NOT APPLE)
 
 install(TARGETS stderred DESTINATION lib)
 
