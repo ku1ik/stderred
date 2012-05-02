@@ -22,7 +22,7 @@ Clone this repository:
     $ git clone git://github.com/sickill/stderred.git
     $ cd stderred
 
-Important: In all cases below make sure that path to `stderred.so` is absolute!
+Important: In all cases below make sure that path to `libstderred.so` is absolute!
 
 ### Building
 
