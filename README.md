@@ -99,9 +99,19 @@ If you prefer other color or you want to use additional escape codes
 (for bold/bright, italic, different background) you can export
 `STDERRED_ESC_CODE` with desired escape code sequence.
 
-Here's example for bold red:
+Here's an example for bold red:
 
     export STDERRED_ESC_CODE=`echo -e "\e[1;31m"`
+
+### Program Blacklisting
+
+If you prefer to not create aliases for programs that don't work well with
+stderred you can export `STDERRED_BLACKLIST` with a desired POSIX Extended
+Regular Expression to match all program names.
+
+Here's an example that will blacklist bash, and program starting with test:
+
+    export STDERRED_BLACKLIST="^(bash|test.*)$"
 
 ## Alternative implementations
 
