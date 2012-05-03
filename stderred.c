@@ -5,6 +5,7 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <regex.h>
 
 #ifdef __APPLE__
   #define FUNC(name) _##name
@@ -38,6 +39,18 @@ bool is_valid_env = false;
 __attribute__((constructor)) void init() {
   if (!strcmp("bash", PROGRAM_NAME)) return;
   if (!isatty(STDERR_FILENO)) return;
+
+  char *blacklist;
+  if (blacklist = getenv("STDERRED_BLACKLIST")) {
+    regex_t regex;
+    if (regcomp(&regex, blacklist, REG_EXTENDED | REG_NOSUB)) return;
+    if (!regexec(&regex, PROGRAM_NAME, 0, NULL, 0)) {
+      regfree(&regex);
+      return;
+    }
+    regfree(&regex);
+  }
+
   is_valid_env = true;
 
   start_color_code = getenv("STDERRED_ESC_CODE");
