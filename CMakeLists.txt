@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(stderred)
 
+add_definitions(-std=c99)
+
 include(CheckCSourceCompiles)
 check_c_source_compiles("
   #include <features.h>
@@ -42,14 +44,24 @@ configure_file(
 
 include_directories("${PROJECT_BINARY_DIR}")
 
-add_library(stderred SHARED stderred.c)
-add_library(test_stderred SHARED mocks.c stderred.c)
+set(stderred_sources stderred.c)
+
+# Because of the way functions are overridden on mac the
+# polyfill should be compiled into stderred instead of linked
+if (APPLE)
+  set(stderred_sources ${stderred_sources} polyfill.c)
+endif (APPLE)
+
+add_library(stderred SHARED ${stderred_sources})
+add_library(test_stderred SHARED mocks.c ${stderred_sources})
 add_executable(test_runner test.c)
+
+add_library(polyfill SHARED polyfill.c)
+target_link_libraries(test_runner dl polyfill)
 
 if (NOT APPLE)
   target_link_libraries(stderred dl)
   target_link_libraries(test_stderred dl)
-  target_link_libraries(test_runner dl)
   set_property(TARGET stderred PROPERTY LINK_FLAGS "-init=init")
 else (NOT APPLE)
   set_property(TARGET stderred PROPERTY LINK_FLAGS "-init _init")
@@ -60,7 +72,7 @@ install(TARGETS stderred DESTINATION lib)
 include(CTest)
 get_property(stderred_lib_location TARGET test_stderred PROPERTY LOCATION)
 macro (do_test arg result)
-  add_test (${arg} test_runner)
+  add_test (${arg} test_runner "${arg}")
   set_tests_properties(${arg}
     PROPERTIES PASS_REGULAR_EXPRESSION ${result})
   if (APPLE)
@@ -72,32 +84,18 @@ macro (do_test arg result)
   endif (APPLE)
 endmacro (do_test)
 
-do_test(printf "^1 printf\\n[^<]")
-do_test(write ">2 write\\n<")
-do_test(fprintf ">2 fprintf\\n<")
-if (HAVE_FPRINTF_UNLOCKED)
-  do_test(fprintf_unlocked ">2 fprintf_unlocked\\n<")
-endif (HAVE_FPRINTF_UNLOCKED)
-do_test(fwrite ">2 fwrite\\n<")
-if (HAVE_FWRITE_UNLOCKED)
-  do_test(fwrite_unlocked ">2 fwrite_unlocked\\n<")
-endif (HAVE_FWRITE_UNLOCKED)
+do_test(printf "1 printf")
+do_test(write ">2 write<")
+do_test(fwrite ">2 fwrite<")
+do_test(fwrite_unlocked "(>><)?>2 fwrite_unlocked<(><<)?")
 do_test(fputc ">2< <= fputc")
-if (HAVE_FPUTC_UNLOCKED)
-  do_test(fputc_unlocked ">2< <= fputc_unlocked\\n")
-endif (HAVE_FPUTC_UNLOCKED)
-do_test(fputs ">2 fputs\\n<")
-if (HAVE_FPUTS_UNLOCKED)
-  do_test(fputs_unlocked ">2 fputs_unlocked\\n<")
-endif (HAVE_FPUTS_UNLOCKED)
-do_test(vfprintf ">2 vfprintf\\n<")
+do_test(fputc_unlocked "(>><)?>2<(><<)? <= fputc_unlocked")
+do_test(fputs ">2 fputs<")
+do_test(fputs_unlocked "(>><)?>2 fputs_unlocked<(><<)?")
+do_test(fprintf ">2 fprintf<")
+do_test(fprintf_unlocked "(>><)?>2 fprintf_unlocked<(><<)?")
+do_test(vfprintf ">2 vfprintf<")
 do_test(perror ">2 perror:[^\\n]+\\n<")
-
-if (HAVE_ERROR)
-  do_test(error ">[^:]*test_runner: 2 error[^\\n]+\\n<")
-endif (HAVE_ERROR)
-
-if (HAVE_ERROR_AT_LINE)
-  do_test(error_at_line ">[^:]*test_runner:[^:]+:[0-9]+: 2 error_at_line[^\\n]+\\n<")
-endif (HAVE_ERROR_AT_LINE)
+do_test(error ">[^:]*test_runner: (<>)?2 error[^\\n]+\\n<")
+do_test(error_at_line ">[^:]*test_runner:[^:]+:[0-9]+: (<>)?2 error_at_line[^\\n]+\\n<")
 
