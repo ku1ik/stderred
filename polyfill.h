@@ -20,7 +20,7 @@ int fprintf_unlocked(FILE *stream, const char *format, ...);
 #endif
 
 #ifndef HAVE_ERROR
-void error(int status, int errnum, const char *format);
+void error(int status, int errnum, const char *format, ...);
 #endif
 
 #ifndef HAVE_ERROR_AT_LINE
