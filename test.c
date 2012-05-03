@@ -4,6 +4,12 @@
 #include <stdarg.h>
 #include <dlfcn.h>
 
+#ifdef __APPLE__
+  #define LIB_PRELOAD_ENV_VAR "DYLIB_INSERT_LIBRARIES"
+#else
+  #define LIB_PRELOAD_ENV_VAR "LD_PRELOAD"
+#endif
+
 void test_vfprintf(const char *format, ...) {
   va_list ap;
   va_start(ap, format);
@@ -12,11 +18,7 @@ void test_vfprintf(const char *format, ...) {
 }
 
 int main() {
-#ifdef __APPLE__
-  void *lib = dlopen(getenv("DYLIB_INSERT_LIBRARIES"), RTLD_LAZY);
-#else
-  void *lib = dlopen(getenv("LD_PRELOAD"), RTLD_LAZY);
-#endif
+  void *lib = dlopen(getenv(LIB_PRELOAD_ENV_VAR), RTLD_LAZY);
   if (!lib) {
     printf("Failed loading lib: %s\n", dlerror());
     exit -1;
@@ -29,8 +31,6 @@ int main() {
   }
   dlclose(lib);
 
-  setenv("STDERRED_ESC_CODE", ">", 1);
-  setenv("STDERRED_END_CODE", "<", 1);
   dup2(STDOUT_FILENO, STDERR_FILENO);
 
   setup_test();

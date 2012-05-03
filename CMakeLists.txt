@@ -31,6 +31,10 @@ endif (HAVE_FWRITE_UNLOCKED)
 check_function_exists(error HAVE_ERROR)
 check_function_exists(error_at_line HAVE_ERROR_AT_LINE)
 
+if (NOT HAVE_GLIBC)
+  check_function_exists(getprogname HAVE_GETPROGNAME)
+endif (NOT HAVE_GLIBC)
+
 configure_file(
   "${PROJECT_SOURCE_DIR}/config.h.in"
   "${PROJECT_BINARY_DIR}/config.h"
@@ -39,6 +43,7 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 add_library(stderred SHARED stderred.c)
+set_property(TARGET stderred PROPERTY LINK_FLAGS "-init _init")
 add_library(test_stderred SHARED mocks.c stderred.c)
 add_executable(test_runner test.c)
 

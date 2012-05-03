@@ -1,3 +1,6 @@
+#ifndef CONFIG_H_IN_95GLRFZR
+#define CONFIG_H_IN_95GLRFZR
+
 #cmakedefine HAVE_FWRITE_UNLOCKED
 #cmakedefine HAVE_FPUTS_UNLOCKED
 #cmakedefine HAVE_FPUTC_UNLOCKED
@@ -7,18 +10,22 @@
 #cmakedefine HAVE_ERROR
 #cmakedefine HAVE_ERROR_AT_LINE
 
-#cmakedefine HAVE_PTY_H
-#cmakedefine HAVE_UTIL_H
+#cmakedefine HAVE_GETPROGNAME
 
 #ifdef HAVE_ERROR_H
   #include <error.h>
 #endif
 
+#ifdef HAVE_GLIBC
+  extern char *program_invocation_short_name;
+  #define PROGRAM_NAME program_invocation_short_name
+#elif defined HAVE_GETPROGNAME
+  #define PROGRAM_NAME getprogname()
+#else
+  #error Missing a way to get program name at run time
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
-extern char *start_color_code;
-extern size_t start_color_code_size;
-
-extern char *end_color_code;
-extern size_t end_color_code_size;
+#endif /* end of include guard: CONFIG_H_IN_95GLRFZR */
