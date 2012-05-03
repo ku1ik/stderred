@@ -32,13 +32,13 @@ size_t start_color_code_size;
 char *end_color_code = "\x1b[0m";
 size_t end_color_code_size;
 
-#define COLORIZE(fd) (valid_env && fd == STDERR_FILENO)
-bool valid_env = false;
+#define COLORIZE(fd) (is_valid_env && fd == STDERR_FILENO)
+bool is_valid_env = false;
 
 __attribute__((constructor)) void init() {
   if (!strcmp("bash", PROGRAM_NAME)) return;
   if (!isatty(STDERR_FILENO)) return;
-  valid_env = true;
+  is_valid_env = true;
 
   start_color_code = getenv("STDERRED_ESC_CODE");
   if (start_color_code == NULL) {

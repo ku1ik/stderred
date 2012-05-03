@@ -1,10 +1,13 @@
 #include "config.h"
 #include "polyfill.h"
+#include "mocks.h"
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <dlfcn.h>
+#include <assert.h>
+#include <signal.h>
 
 #ifdef __APPLE__
   #define LIB_PRELOAD_ENV_VAR "DYLIB_INSERT_LIBRARIES"
@@ -20,6 +23,14 @@ typedef struct {
 
 #define TEST(name) static void test_##name()
 #define UNIT(name) {#name, &test_##name}
+
+struct stderred stderred;
+
+void signal_handler(int sig) {
+  if (sig == SIGABRT) {
+    exit(EXIT_FAILURE);
+  }
+}
 
 TEST(printf) {
   printf("1 printf");
@@ -86,6 +97,32 @@ TEST(error_at_line) {
   error_at_line(0, ENOENT, __FILE__, __LINE__, "%s", "2 error_at_line");
 }
 
+TEST(blacklist) {
+  // Verify on a normal startup that the env is good
+  assert(*stderred.has_valid_env);
+
+  // Reset env, blacklist ourself explicitly and reinit
+  stderred.reset();
+  setenv("STDERRED_BLACKLIST", PROGRAM_NAME, 1);
+  stderred.init();
+
+  // Verify that with ourself blacklisted the env is invalid
+  assert(!*stderred.has_valid_env);
+
+  // Reset again and use a regex for our name
+  stderred.reset();
+  setenv("STDERRED_BLACKLIST", "test_.*", 1);
+  stderred.init();
+
+  // Verify the blacklist accepts the regex and marks env as invalid
+  assert(!*stderred.has_valid_env);
+
+  // Test to make sure above did not pass because of false positives
+  stderred.reset();
+  stderred.init();
+  assert(*stderred.has_valid_env);
+}
+
 unit_test tests[] = {
   UNIT(printf),
   UNIT(write),
@@ -101,7 +138,9 @@ unit_test tests[] = {
   UNIT(perror),
   UNIT(error),
   UNIT(error_at_line),
+  UNIT(blacklist)
 };
+
 
 int main(int argc, char **argv) {
   if (argc < 2) {
@@ -117,21 +156,29 @@ int main(int argc, char **argv) {
     printf("Failed loading lib: %s\n", dlerror());
     return EXIT_FAILURE;
   }
-  void (*setup_test)() = dlsym(lib, "setup_test");
 
-  if (!setup_test) {
-    printf("Failed getting setup test: %s\n", dlerror());
+  void (*init_mocks)() = dlsym(lib, "init_mocks");
+
+  if (!init_mocks) {
+    printf("Failed getting mocks init function: %s\n", dlerror());
     return EXIT_FAILURE;
   }
   dlclose(lib);
+
+  init_mocks(&stderred);
+
+  struct sigaction act;
+  act.sa_handler = signal_handler;
+  sigaction(SIGABRT, &act, NULL);
 
   // Needed so ctest can get output for comparison
   dup2(STDOUT_FILENO, STDERR_FILENO);
 
   for (int i = 0, num = sizeof(tests)/sizeof(unit_test); i < num; i++) {
     if(!strcmp(tests[i].name, argv[1])) {
-      setup_test();
+      stderred.init();
       tests[i].test();
+      stderred.reset();
       return EXIT_SUCCESS;
     }
   }
