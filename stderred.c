@@ -39,7 +39,6 @@ size_t end_color_code_size;
 #define COLORIZE(fd) (valid_env && fd == STDERR_FILENO)
 bool valid_env = false;
 
-/* __attribute__((section("_libc_subinit"))) static void init(int argc, char **argv, char **envp)  { */
 void init() {
   if (!strcmp("bash", PROGRAM_NAME)) return;
   if (!isatty(STDERR_FILENO)) return;
