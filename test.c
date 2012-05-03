@@ -125,6 +125,7 @@ int main(int argc, char **argv) {
   }
   dlclose(lib);
 
+  // Needed so ctest can get output for comparison
   dup2(STDOUT_FILENO, STDERR_FILENO);
 
   for (int i = 0, num = sizeof(tests)/sizeof(unit_test); i < num; i++) {
