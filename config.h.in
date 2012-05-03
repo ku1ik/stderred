@@ -1,6 +1,8 @@
 #ifndef CONFIG_H_IN_95GLRFZR
 #define CONFIG_H_IN_95GLRFZR
 
+#cmakedefine HAVE_GLIBC
+
 #cmakedefine HAVE_FWRITE_UNLOCKED
 #cmakedefine HAVE_FPUTS_UNLOCKED
 #cmakedefine HAVE_FPUTC_UNLOCKED

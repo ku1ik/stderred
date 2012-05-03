@@ -43,7 +43,6 @@ configure_file(
 include_directories("${PROJECT_BINARY_DIR}")
 
 add_library(stderred SHARED stderred.c)
-set_property(TARGET stderred PROPERTY LINK_FLAGS "-init _init")
 add_library(test_stderred SHARED mocks.c stderred.c)
 add_executable(test_runner test.c)
 
@@ -51,6 +50,9 @@ if (NOT APPLE)
   target_link_libraries(stderred dl)
   target_link_libraries(test_stderred dl)
   target_link_libraries(test_runner dl)
+  set_property(TARGET stderred PROPERTY LINK_FLAGS "-init=init")
+else (NOT APPLE)
+  set_property(TARGET stderred PROPERTY LINK_FLAGS "-init _init")
 endif(NOT APPLE)
 
 install(TARGETS stderred DESTINATION lib)
