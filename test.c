@@ -1,5 +1,7 @@
 #include "config.h"
+#include "polyfill.h"
 #include <unistd.h>
+#include <string.h>
 #include <errno.h>
 #include <stdarg.h>
 #include <dlfcn.h>
@@ -10,84 +12,130 @@
   #define LIB_PRELOAD_ENV_VAR "LD_PRELOAD"
 #endif
 
-void test_vfprintf(const char *format, ...) {
+typedef void (*test)();
+typedef struct {
+  char *name;
+  test test;
+} unit_test;
+
+#define TEST(name) static void test_##name()
+#define UNIT(name) {#name, &test_##name}
+
+TEST(printf) {
+  printf("1 printf");
+  fflush(stdout);
+}
+
+TEST(write) {
+  write(2, "2 write", 7);
+}
+
+TEST(fwrite) {
+  fwrite("2 fwrite", 8, 1, stderr);
+}
+
+TEST(fwrite_unlocked) {
+  fwrite_unlocked("2 fwrite_unlocked", 17, 1, stderr);
+}
+
+TEST(fputc) {
+  fputc(0x32, stderr); fflush(stderr); printf(" <= fputc"); fflush(stdout);
+}
+
+TEST(fputc_unlocked) {
+  fputc_unlocked(0x32, stderr); fflush(stderr);
+  printf(" <= fputc_unlocked"); fflush(stdout);
+}
+
+TEST(fputs) {
+  fputs("2 fputs", stderr);
+}
+
+TEST(fputs_unlocked) {
+  fputs_unlocked("2 fputs_unlocked", stderr);
+}
+
+TEST(fprintf) {
+  fprintf(stderr, "%s", "2 fprintf");
+}
+
+TEST(fprintf_unlocked) {
+  fprintf_unlocked(stderr, "%s", "2 fprintf_unlocked");
+}
+
+void test_vfprintf_helper(const char *format, ...) {
   va_list ap;
   va_start(ap, format);
   vfprintf(stderr, format, ap);
   va_end(ap);
 }
 
-int main() {
+TEST(vfprintf) {
+  test_vfprintf_helper("2 %s", "vfprintf");
+}
+
+TEST(perror) {
+  errno = ENOSYS; perror("2 perror");
+}
+
+TEST(error) {
+  error(0, ENOSYS, "%s", "2 error");
+}
+
+TEST(error_at_line) {
+  error_at_line(0, ENOENT, __FILE__, __LINE__, "%s", "2 error_at_line");
+}
+
+unit_test tests[] = {
+  UNIT(printf),
+  UNIT(write),
+  UNIT(fwrite),
+  UNIT(fwrite_unlocked),
+  UNIT(fputc),
+  UNIT(fputc_unlocked),
+  UNIT(fputs),
+  UNIT(fputs_unlocked),
+  UNIT(fprintf),
+  UNIT(fprintf_unlocked),
+  UNIT(vfprintf),
+  UNIT(perror),
+  UNIT(error),
+  UNIT(error_at_line),
+};
+
+int main(int argc, char **argv) {
+  if (argc < 2) {
+    printf("Must supply a test name to run, choices are:\n");
+    for (int i = 0, num = sizeof(tests)/sizeof(unit_test); i < num; i++) {
+      printf("  %s\n", tests[i].name);
+    }
+    return EXIT_FAILURE;
+  }
+
   void *lib = dlopen(getenv(LIB_PRELOAD_ENV_VAR), RTLD_LAZY);
   if (!lib) {
     printf("Failed loading lib: %s\n", dlerror());
-    exit -1;
+    return EXIT_FAILURE;
   }
   void (*setup_test)() = dlsym(lib, "setup_test");
 
   if (!setup_test) {
     printf("Failed getting setup test: %s\n", dlerror());
-    exit -2;
+    return EXIT_FAILURE;
   }
   dlclose(lib);
 
   dup2(STDOUT_FILENO, STDERR_FILENO);
 
-  setup_test();
-  printf("1 printf\n");
-  fflush(stdout);
+  for (int i = 0, num = sizeof(tests)/sizeof(unit_test); i < num; i++) {
+    if(!strcmp(tests[i].name, argv[1])) {
+      setup_test();
+      tests[i].test();
+      return EXIT_SUCCESS;
+    }
+  }
 
-  setup_test();
-  write(2, "2 write\n", 8);
-
-  setup_test();
-  fprintf(stderr, "%s", "2 fprintf\n");
-
-#ifdef HAVE_FPRINTF_UNLOCKED
-  setup_test();
-  fprintf_unlocked(stderr, "%s", "2 fprintf_unlocked\n");
-#endif
-
-  setup_test();
-  fwrite("2 fwrite\n", 9, 1, stderr);
-
-#ifdef HAVE_FWRITE_UNLOCKED
-  setup_test();
-  fwrite_unlocked("2 fwrite_unlocked\n", 18, 1, stderr);
-#endif
-
-  setup_test();
-  fputc(0x32, stderr); fflush(stderr); printf(" <= fputc\n"); fflush(stdout);
-
-#ifdef HAVE_FPUTC_UNLOCKED
-  setup_test();
-  fputc_unlocked(0x32, stderr); fflush(stderr);
-  printf(" <= fputc_unlocked\n"); fflush(stdout);
-#endif
-
-  setup_test();
-  fputs("2 fputs\n", stderr);
-
-#ifdef HAVE_FPUTS_UNLOCKED
-  setup_test();
-  fputs_unlocked("2 fputs_unlocked\n", stderr);
-#endif
-
-  setup_test();
-  test_vfprintf("2 %s\n", "vfprintf");
-
-  setup_test();
-  errno = ENOSYS; perror("2 perror");
-
-#ifdef HAVE_ERROR
-  setup_test();
-  error(0, ENOSYS, "%s", "2 error");
-#endif
-
-#ifdef HAVE_ERROR_AT_LINE
-  setup_test();
-  error_at_line(0, ENOENT, __FILE__, __LINE__, "%s", "2 error_at_line");
-#endif
-
-  return 0;
+  printf("Test \"%s\" does not exist.\n"
+         "Try supplying no arguments to see available tests\n", argv[1]);
+  return EXIT_FAILURE;
 }
