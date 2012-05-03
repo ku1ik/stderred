@@ -103,11 +103,6 @@ Here's example for bold red:
 
     export STDERRED_ESC_CODE=`echo -e "\e[1;31m"`
 
-If you want to go crazy you can even use `STDERRED_END_CODE` to insert
-something other than the color reset code at the end of the stderr stream. This
-isn't advised though because it prevents you from easily telling stderr apart
-from stdout. Wasn't that the whole point of stderred?
-
 ## Alternative implementations
 
 Simpler and much less reliable solution when using Zsh is to use named pipes
