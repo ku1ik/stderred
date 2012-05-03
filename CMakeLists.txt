@@ -46,7 +46,7 @@ include_directories("${PROJECT_BINARY_DIR}")
 
 set(stderred_sources stderred.c)
 
-# Because of the way functions are overridden on mac they
+# Because of the way functions are overridden on mac the
 # polyfill should be compiled into stderred instead of linked
 if (APPLE)
   set(stderred_sources ${stderred_sources} polyfill.c)
