@@ -12,7 +12,7 @@ size_t fwrite_unlocked(const void *ptr, size_t size, size_t n, FILE *stream) {
   while (len > 0) {
     do {
       written = write(fd, ptr + total, len);
-    } while(written < 0 && written == EINTR);
+    } while((ssize_t)written < 0 && written == EINTR);
 
     if (written == (size_t)-1) break;
     if (written == 0) {
@@ -30,13 +30,13 @@ size_t fwrite_unlocked(const void *ptr, size_t size, size_t n, FILE *stream) {
 
 #ifndef HAVE_FPUTC_UNLOCKED
 int fputc_unlocked(int c, FILE *stream) {
-  fputc(c, stream);
+  return fputc(c, stream);
 }
 #endif
 
 #ifndef HAVE_FPUTS_UNLOCKED
 int fputs_unlocked(const char *s, FILE *stream) {
-  fputs(s, stream);
+  return fputs(s, stream);
 }
 #endif
 
@@ -44,8 +44,9 @@ int fputs_unlocked(const char *s, FILE *stream) {
 int fprintf_unlocked(FILE *stream, const char *format, ...) {
   va_list ap;
   va_start(ap, format);
-  vfprintf(stream, format, ap);
+  int status = vfprintf(stream, format, ap);
   va_end(ap);
+  return status;
 }
 #endif
 

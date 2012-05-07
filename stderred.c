@@ -41,7 +41,7 @@ __attribute__((constructor)) void init() {
   if (!isatty(STDERR_FILENO)) return;
 
   char *blacklist;
-  if (blacklist = getenv("STDERRED_BLACKLIST")) {
+  if ((blacklist = getenv("STDERRED_BLACKLIST"))) {
     regex_t regex;
     if (regcomp(&regex, blacklist, REG_EXTENDED | REG_NOSUB)) return;
     if (!regexec(&regex, PROGRAM_NAME, 0, NULL, 0)) {
@@ -94,7 +94,7 @@ size_t FUNC(fwrite_unlocked)(const void *data, size_t size, size_t count, FILE *
 
   if (COLORIZE(fd)) {
     result = ORIGINAL(fwrite_unlocked)(start_color_code, sizeof(char), start_color_code_size, stream);
-    if (result < 0) return result;
+    if ((ssize_t)result < 0) return result;
   }
 
   result = ORIGINAL(fwrite_unlocked)(data, size, count, stream);
@@ -115,7 +115,7 @@ size_t FUNC(fwrite)(const void *data, size_t size, size_t count, FILE *stream) {
 
   if (COLORIZE(fd)) {
     result = ORIGINAL(fwrite)(start_color_code, sizeof(char), start_color_code_size, stream);
-    if (result < 0) return result;
+    if ((ssize_t)result < 0) return result;
   }
 
   result = ORIGINAL(fwrite)(data, size, count, stream);
