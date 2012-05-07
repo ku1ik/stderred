@@ -22,25 +22,20 @@ Clone this repository:
     $ git clone git://github.com/sickill/stderred.git
     $ cd stderred
 
-Important: In all cases below make sure that path to `stderred.so` is absolute!
+Important: In all cases below make sure that path to `libstderred.so` is absolute!
 
-### 32-bit Linux or FreeBSD
+### Building
 
-    $ make lib/stderred.so
-
-Export `LD_PRELOAD` variable in your shell's config file by putting following
-in your .bashrc/.zshrc:
-
-    export LD_PRELOAD="/absolute/path/to/lib/stderred.so"
-
-### 64-bit Linux or FreeBSD
-
-    $ make lib64/stderred.so
+    $ make
 
 Export `LD_PRELOAD` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export LD_PRELOAD="/absolute/path/to/lib64/stderred.so"
+    export LD_PRELOAD="/absolute/path/to/stderred/build/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+
+### Multi-Arch Linux or FreeBSD
+
+    $ make 32 && make 64
 
 On some Linux distros you can install 32-bit packages on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
@@ -64,40 +59,37 @@ compile it like this:
 
 and export `LD_PRELOAD` like this in your shell's config:
 
-    export LD_PRELOAD="/path/to/stderred/\$LIB/stderred.so"
+    export LD_PRELOAD="/path/to/stderred/\$LIB/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
 _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gmane.org/gmane.comp.lib.glibc.user/974)._
 
 ### OSX
 
-    $ make both
-    $ lipo -create lib/stderred.so lib64/stderred.so -output lib/stderred.dylib
-
 Export `DYLD_INSERT_LIBRARIES` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export DYLD_INSERT_LIBRARIES=/absolute/path/to/lib/stderred.dylib DYLD_FORCE_FLAT_NAMESPACE=1
+    export DYLD_INSERT_LIBRARIES="/absolute/path/to/build/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
 
-**Note:** Installing on OS X will break the `open` command line utility. So
-things like `mvim` and `open` itself will not work unless the application being
-opened is already opened. It's because of flat namespace forced by
-`DYLD_FORCE_FLAT_NAMESPACE` which is required by `DYLD_INSERT_LIBRARIES`.
+### Universal lib on OSX
+
+    $ make universal
 
 ### Aliasing
 
 Alternative to enabling it globally via shell config is to create alias and
 use it to selectively colorize stderr for the commands you run:
 
-    $ alias stderred='LD_PRELOAD=/absolute/path/to/lib/stderred.so'
+    $ alias stderred="LD_PRELOAD=/absolute/path/to/build/libstderred.so\${LD_PRELOAD:+:\$LD_PRELOAD}"
     $ stderred java lol
 
 ### Checking if it works
 
     $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
+    $ STDERRED_ESC_CODE=$(echo -e '\e[;92m') ruby -e 'puts "Yo!"; warn "Jola"'
 
-Jola should be in red dress.
+Jola should be in a red and green dress.
 
-![stderred in action](https://github.com/downloads/sickill/stderred/stderred.png)
+![stderred in action](https://github.com/downloads/cehoffman/stderred/stderred.png)
 
 ## Configuration
 
@@ -107,9 +99,19 @@ If you prefer other color or you want to use additional escape codes
 (for bold/bright, italic, different background) you can export
 `STDERRED_ESC_CODE` with desired escape code sequence.
 
-Here's example for bold red:
+Here's an example for bold red:
 
     export STDERRED_ESC_CODE=`echo -e "\e[1;31m"`
+
+### Program Blacklisting
+
+If you prefer to not create aliases for programs that don't work well with
+stderred you can export `STDERRED_BLACKLIST` with a desired POSIX Extended
+Regular Expression to match all program names.
+
+Here's an example that will blacklist bash, and program starting with test:
+
+    export STDERRED_BLACKLIST="^(bash|test.*)$"
 
 ## Alternative implementations
 
@@ -130,6 +132,7 @@ Current implementation:
 
 * Marcin Kulik
 * Brian Tarricone
+* Chris Hoffman
 
 ## License
 
