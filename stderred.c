@@ -238,7 +238,7 @@ void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned 
 #ifdef __APPLE__
   #define INTERPOSE(name) { (void *)FUNC(name), (void *)name }
   typedef struct { void *new; void *old; } interpose;
-  static const interpose interposers[] \
+  __attribute__((used)) static const interpose interposers[] \
     __attribute__((section("__DATA,__interpose"))) = {
       INTERPOSE(write),
       INTERPOSE(fwrite),
