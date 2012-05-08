@@ -27,6 +27,16 @@ Important: In all cases below make sure that path to `libstderred.so` is absolut
 
 ### Linux and FreeBSD
 
+Make sure you have gcc toolchain required for compilation installed:
+
+    # Ubuntu
+    sudo apt-get install build-essential cmake
+
+    # Fedora
+    sudo yum install make cmake gcc gcc-c++
+
+Build:
+
     $ make
 
 Export `LD_PRELOAD` variable in your shell's config file by putting following
