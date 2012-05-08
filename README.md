@@ -4,13 +4,14 @@ stderr in red.
 
 ## About
 
-stderred hooks on write() function from libc in order to colorize all
-stderr output that goes to terminal thus making it distinguishable from stdout.
-Basically it wraps text that goes to file with descriptor "2" with proper
-escape codes making text red.
+stderred hooks on write() and a family of stream functions (fwrite, fprintf,
+error...) from libc in order to colorize all stderr output that goes to
+terminal thus making it distinguishable from stdout.  Basically it wraps text
+that goes to file with descriptor "2" with proper ANSI escape codes making text
+red.
 
 It's implemented as a shared library and doesn't require recompilation of
-existing binaries thanks to "preload/insert" feature of dynamic linkers.
+existing binaries thanks to _preload/insert_ feature of dynamic linkers.
 
 It's supported on Linux (with `LD_PRELOAD`), FreeBSD (also `LD_PRELOAD`) and
 OSX (with `DYLD_INSERT_LIBRARIES`).
@@ -84,6 +85,9 @@ use it to selectively colorize stderr for the commands you run:
 
 ### Checking if it works
 
+    $ find -q
+    $ cat nonexistingfile
+    $ ls nonexistingfile
     $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
     $ STDERRED_ESC_CODE=$(echo -e '\e[;92m') ruby -e 'puts "Yo!"; warn "Jola"'
 
@@ -105,11 +109,13 @@ Here's an example for bold red:
 
 ### Program Blacklisting
 
-If you prefer to not create aliases for programs that don't work well with
-stderred you can export `STDERRED_BLACKLIST` with a desired POSIX Extended
-Regular Expression to match all program names.
+Some programs abuse stderr and print stuff on it even when they really
+shouldn't.  If you want to turn off stderred for particular programs you can
+export `STDERRED_BLACKLIST` with a desired POSIX Extended Regular Expression
+matching names of these programs.
 
-Here's an example that will blacklist bash, and program starting with test:
+Here's an example that will blacklist bash, and all programs with names
+starting with "test":
 
     export STDERRED_BLACKLIST="^(bash|test.*)$"
 
@@ -123,16 +129,16 @@ writing to stderr though.
 
 ## Authors
 
+Current implementation:
+
+* Marcin Kulik
+* Chris Hoffman
+* Brian Tarricone
+
 [Original concept](http://www.asheesh.org/note/software/stderred.html) and
 [initial implementation](http://git.asheesh.org/?p=zzz/colorize-stderr.git;a=summary):
 
 * Asheesh Laroia
-
-Current implementation:
-
-* Marcin Kulik
-* Brian Tarricone
-* Chris Hoffman
 
 ## License
 
