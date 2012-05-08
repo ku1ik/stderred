@@ -36,8 +36,6 @@ in your .bashrc/.zshrc:
 
 #### Multi-arch Linux and FreeBSD
 
-    $ make 32 && make 64
-
 On some Linux distros you can install 32-bit packages on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
 happens that 64-bit binaries call 32-bit ones resulting in warning message
@@ -56,7 +54,7 @@ both architectures:
 
 compile it like this:
 
-    $ make both
+    $ make 32 && make 64
 
 and export `LD_PRELOAD` like this in your shell's config:
 
@@ -66,6 +64,8 @@ _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gma
 
 ### OSX
 
+    $ make
+
 Export `DYLD_INSERT_LIBRARIES` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
@@ -73,7 +73,16 @@ in your .bashrc/.zshrc:
 
 #### Universal lib on OSX
 
+OSX solves multi-arch problem (described above in "Multi-arch Linux and
+FreeBSD") by supporting so called "universal" libraries that include 2 copies
+of code compiled for both 32 and 64-bit architecture in the single library
+file.
+
+If you feel you will want universal library build this way:
+
     $ make universal
+
+and export shell env like above.
 
 ### Checking if it works
 
