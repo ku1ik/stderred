@@ -140,9 +140,9 @@ writing to stderr though.
 
 Current implementation:
 
-* Marcin Kulik
-* Chris Hoffman
-* Brian Tarricone
+* [Marcin Kulik](https://github.com/sickill/)
+* [Chris Hoffman](https://github.com/cehoffman/)
+* [Brian Tarricone](https://github.com/kelnos/)
 
 [Original concept](http://www.asheesh.org/note/software/stderred.html) and
 [initial implementation](http://git.asheesh.org/?p=zzz/colorize-stderr.git;a=summary):
