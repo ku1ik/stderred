@@ -25,7 +25,7 @@ Clone this repository:
 
 Important: In all cases below make sure that path to `libstderred.so` is absolute!
 
-### Building
+### Linux and FreeBSD
 
     $ make
 
@@ -34,7 +34,7 @@ in your .bashrc/.zshrc:
 
     export LD_PRELOAD="/absolute/path/to/stderred/build/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
-### Multi-Arch Linux or FreeBSD
+#### Multi-arch Linux and FreeBSD
 
     $ make 32 && make 64
 
@@ -71,17 +71,9 @@ in your .bashrc/.zshrc:
 
     export DYLD_INSERT_LIBRARIES="/absolute/path/to/build/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
 
-### Universal lib on OSX
+#### Universal lib on OSX
 
     $ make universal
-
-### Aliasing
-
-Alternative to enabling it globally via shell config is to create alias and
-use it to selectively colorize stderr for the commands you run:
-
-    $ alias stderred="LD_PRELOAD=/absolute/path/to/build/libstderred.so\${LD_PRELOAD:+:\$LD_PRELOAD}"
-    $ stderred java lol
 
 ### Checking if it works
 
@@ -94,6 +86,14 @@ use it to selectively colorize stderr for the commands you run:
 Jola should be in a red and green dress.
 
 ![stderred in action](https://github.com/downloads/cehoffman/stderred/stderred.png)
+
+## Alternative way: aliasing
+
+Alternative to enabling it globally via shell config is to create alias and
+use it to selectively colorize stderr for the commands you run:
+
+    $ alias stderred="LD_PRELOAD=/absolute/path/to/build/libstderred.so\${LD_PRELOAD:+:\$LD_PRELOAD}"
+    $ stderred java lol
 
 ## Configuration
 
