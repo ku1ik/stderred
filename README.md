@@ -78,7 +78,7 @@ FreeBSD") by supporting so called "universal" libraries that include 2 copies
 of code compiled for both 32 and 64-bit architecture in the single library
 file.
 
-If you feel you will want universal library build this way:
+If you feel you will want universal library then build it this way:
 
     $ make universal
 
