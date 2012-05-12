@@ -18,33 +18,44 @@ OSX (with `DYLD_INSERT_LIBRARIES`).
 
 ## Installation
 
-Clone this repository:
+### Ubuntu (64-bit)
+
+Download latest .deb package from https://github.com/sickill/stderred/downloads
+and install it with:
+
+    sudo dpkg -i stderred_1.0_amd64.deb
+
+### Fedora (64-bit)
+
+Download latest .rpm package from https://github.com/sickill/stderred/downloads
+and install it with:
+
+    sudo rpm -i stderred-1.0-1.x86_64.rpm
+
+### From source
+
+Clone the repository:
 
     $ git clone git://github.com/sickill/stderred.git
     $ cd stderred
 
 Important: In all cases below make sure that path to `libstderred.so` is absolute!
 
-### Linux and FreeBSD
+#### Linux and FreeBSD
 
-Make sure you have gcc toolchain required for compilation installed:
-
-    # Ubuntu
-    sudo apt-get install build-essential cmake
-
-    # Fedora
-    sudo yum install make cmake gcc gcc-c++
+First, make sure you have basic gcc toolchain installed. gcc, make and cmake
+should be enough.
 
 Build:
 
     $ make
 
-Export `LD_PRELOAD` variable in your shell's config file by putting following
-in your .bashrc/.zshrc:
+In your shell's config file export `LD_PRELOAD` variable pointing to built
+shared library. Put following in your .bashrc/.zshrc:
 
     export LD_PRELOAD="/absolute/path/to/stderred/build/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
-#### Multi-arch Linux and FreeBSD
+##### Multi-arch Linux and FreeBSD
 
 On some Linux distros you can install 32-bit packages on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
@@ -72,7 +83,7 @@ and export `LD_PRELOAD` like this in your shell's config:
 
 _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gmane.org/gmane.comp.lib.glibc.user/974)._
 
-### OSX
+#### OSX
 
     $ make
 
@@ -81,7 +92,7 @@ in your .bashrc/.zshrc:
 
     export DYLD_INSERT_LIBRARIES="/absolute/path/to/build/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
 
-#### Universal lib on OSX
+##### Universal lib on OSX
 
 OSX solves multi-arch problem (described above in "Multi-arch Linux and
 FreeBSD") by supporting so called "universal" libraries that include 2 copies
