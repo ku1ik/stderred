@@ -24,10 +24,11 @@ test: build
 clean:
 	rm -rf build lib lib64
 
-dist: build_lib package_deb
+dist: dist_prepare package_deb
 
-build_lib: test
-	rm -rf usr/lib && mkdir usr/lib && cp build/libstderred.so usr/lib/
+dist_prepare: test
+	mkdir -p usr/lib && cp build/libstderred.so usr/lib/
+	mkdir -p usr/share/doc/stderred && cp README.md usr/share/doc/stderred/
 
 package_deb:
-	rm *.deb && fpm -s dir -t deb -n stderred -v `git tag | grep v | cut -d 'v' -f 2 | sort -nr | head -n 1` --license MIT --vendor 'Marcin Kulik' -m 'Marcin Kulik <marcin.kulik+stderred@gmail.com>' --description "stderr in red" --url https://github.com/sickill/stderred usr/bin/stderred usr/lib/libstderred.so
+	rm *.deb && fpm -s dir -t deb -n stderred -v `git tag | grep v | cut -d 'v' -f 2 | sort -nr | head -n 1` --license MIT --vendor 'Marcin Kulik' -m 'Marcin Kulik <marcin.kulik+stderred@gmail.com>' --description "stderr in red" --url https://github.com/sickill/stderred usr/bin/stderred usr/lib/libstderred.so usr/share/stderred/stderred.sh usr/share/doc/stderred/README.md
