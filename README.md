@@ -25,12 +25,20 @@ and install it with:
 
     sudo dpkg -i stderred_1.0_amd64.deb
 
+Add following line to your .bashrc/.zshrc:
+
+    [[ -s /usr/share/stderred/stderred.sh ]] && source /usr/share/stderred/stderred.sh
+
 ### Fedora (64-bit)
 
 Download latest .rpm package from https://github.com/sickill/stderred/downloads
 and install it with:
 
     sudo rpm -i stderred-1.0-1.x86_64.rpm
+
+Add following line to your .bashrc/.zshrc:
+
+    [[ -s /usr/share/stderred/stderred.sh ]] && source /usr/share/stderred/stderred.sh
 
 ### From source
 
