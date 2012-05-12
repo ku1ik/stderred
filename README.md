@@ -65,7 +65,7 @@ shared library. Put following in your .bashrc/.zshrc:
 
 ##### Multi-arch Linux and FreeBSD
 
-On some Linux distros you can install 32-bit packages on 64-bit system.  Shared
+With some Linux distros you can install 32-bit packages on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
 happens that 64-bit binaries call 32-bit ones resulting in warning message
 printed to terminal about not compatible `LD_PRELOAD` shared lib.
