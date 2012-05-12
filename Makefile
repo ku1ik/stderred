@@ -1,19 +1,19 @@
 all: test
 
 build: clean
-	mkdir build && cd build && cmake .. && make
+	mkdir build && cd build && cmake ../src && make
 
 32: clean32
-	mkdir lib && cd lib && CFLAGS='-m32' cmake .. && make && make test
+	mkdir lib && cd lib && CFLAGS='-m32' cmake ../src && make && make test
 
 clean32:
 	rm -rf lib32
 
 64: clean64
-	mkdir lib64 && cd lib64 && CFLAGS='-m64' cmake .. && make && make test
+	mkdir lib64 && cd lib64 && CFLAGS='-m64' cmake ../src && make && make test
 
 universal: clean
-	mkdir build && cd build && cmake .. -DCMAKE_OSX_ARCHITECTURES="x86_64;i386" && make && make test
+	mkdir build && cd build && cmake ../src -DCMAKE_OSX_ARCHITECTURES="x86_64;i386" && make && make test
 
 clean64:
 	rm -rf lib64
