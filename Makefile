@@ -7,7 +7,7 @@ build: clean
 	mkdir lib && cd lib && CFLAGS='-m32' cmake ../src && make && make test
 
 clean32:
-	rm -rf lib32
+	rm -rf lib
 
 64: clean64
 	mkdir lib64 && cd lib64 && CFLAGS='-m64' cmake ../src && make && make test
