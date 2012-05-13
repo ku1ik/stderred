@@ -25,6 +25,7 @@
 #cmakedefine HAVE_VWARNC
 #cmakedefine HAVE_WARNX
 #cmakedefine HAVE_VWARNX
+#cmakedefine HAVE_ERR_SET_FILE
 
 #cmakedefine HAVE_GETPROGNAME
 

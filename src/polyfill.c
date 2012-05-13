@@ -81,6 +81,16 @@ void error_at_line(int status, int errnum, const char *filename,
 }
 #endif
 
+#ifndef HAVE_ERR_SET_FILE
+void *err_output = NULL;
+void err_set_file(void *fp) {
+  err_output = fp;
+}
+#define ERR_OUTPUT err_output ? err_output : stderr
+#else
+  #define ERR_OUPUT stderr
+#endif
+
 #ifndef HAVE_ERR
 void err(int eval, const char *fmt, ...) {
   if (fmt) {
@@ -181,7 +191,7 @@ void vwarnc(int code, const char *fmt, va_list args) {
     free(buf1);
   }
 
-  fprintf(stderr, "%s: %s\n", PROGRAM_NAME, buf2 ? buf2 : "\0");
+  fprintf(ERR_OUTPUT, "%s: %s\n", PROGRAM_NAME, buf2 ? buf2 : "\0");
 
   if (buf2) free(buf2);
 }
@@ -206,7 +216,7 @@ void vwarnx(const char *fmt, va_list args) {
 
   if (fmt) vasprintf(&buf, fmt, ap);
 
-  fprintf(stderr, "%s: %s\n", PROGRAM_NAME, buf ? buf : "\0");
+  fprintf(ERR_OUTPUT, "%s: %s\n", PROGRAM_NAME, buf ? buf : "\0");
 
   if (buf) free(buf);
 }

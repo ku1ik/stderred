@@ -187,6 +187,15 @@ TEST(vwarnx) {
   test_vwarnx_helper("%s", "2 vwarnx");
 }
 
+TEST(err_uses_set_file) {
+  err_set_file(stdout);
+  warnx("%s", "1 warnx");
+  fflush(stdout);
+
+  err_set_file(NULL);
+  warnx("%s", "2 warnx");
+}
+
 TEST(blacklist) {
   // Verify on a normal startup that the env is good
   assert(*stderred.has_valid_env);
@@ -240,6 +249,7 @@ unit_test tests[] = {
   UNIT(vwarnc),
   UNIT(warnx),
   UNIT(vwarnx),
+  UNIT(err_uses_set_file),
   UNIT(blacklist)
 };
 

@@ -76,5 +76,9 @@ void warnx(const char *fmt, ...);
 void vwarnx(const char *fmt, va_list args);
 #endif
 
+#ifndef HAVE_ERR_SET_FILE
+void err_set_file(void *fp);
+#endif
+
 #endif /* end of include guard: POLYFIL_H_WFSH9MOG */
 

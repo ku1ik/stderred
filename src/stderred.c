@@ -386,5 +386,6 @@ void FUNC(warnx)(const char *fmt, ...) {
       INTERPOSE(vwarnc),
       INTERPOSE(warnx),
       INTERPOSE(vwarnx),
+      INTERPOSE(err_set_file),
   };
 #endif
