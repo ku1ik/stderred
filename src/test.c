@@ -97,6 +97,96 @@ TEST(error_at_line) {
   error_at_line(0, ENOENT, __FILE__, __LINE__, "%s", "2 error_at_line");
 }
 
+TEST(err) {
+  err(EXIT_SUCCESS, "%s", "2 err");
+}
+
+static void test_verr_helper(int eval, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  verr(eval, fmt, args);
+  va_end(args);
+}
+
+TEST(verr) {
+  test_verr_helper(EXIT_SUCCESS, "%s", "2 verr");
+}
+
+TEST(errc) {
+  errc(EXIT_SUCCESS, ENOSYS, "%s", "2 errc");
+}
+
+static void test_verrc_helper(int eval, int code, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  verrc(eval, code, fmt, args);
+  va_end(args);
+}
+
+TEST(verrc) {
+  test_verrc_helper(EXIT_SUCCESS, ENOSYS, "%s", "2 verrc");
+}
+
+TEST(errx) {
+  errx(EXIT_SUCCESS, "%s", "2 errx");
+}
+
+static void test_verrx_helper(int eval, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  verrx(eval, fmt, args);
+  va_end(args);
+}
+
+TEST(verrx) {
+  test_verrx_helper(EXIT_SUCCESS, "%s", "2 verrx");
+}
+
+TEST(warn) {
+  warn("%s", "2 warn");
+}
+
+static void test_vwarn_helper(const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  vwarn(fmt, args);
+  va_end(args);
+}
+
+TEST(vwarn) {
+  test_vwarn_helper("%s", "2 vwarn");
+}
+
+TEST(warnc) {
+  warnc(ENOSYS, "%s", "2 warnc");
+}
+
+static void test_vwarnc_helper(int code, const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  vwarnc(code, fmt, args);
+  va_end(args);
+}
+
+TEST(vwarnc) {
+  test_vwarnc_helper(ENOSYS, "%s", "2 vwarnc");
+}
+
+TEST(warnx) {
+  warnx("%s", "2 warnx");
+}
+
+static void test_vwarnx_helper(const char *fmt, ...) {
+  va_list args;
+  va_start(args, fmt);
+  vwarnx(fmt, args);
+  va_end(args);
+}
+
+TEST(vwarnx) {
+  test_vwarnx_helper("%s", "2 vwarnx");
+}
+
 TEST(blacklist) {
   // Verify on a normal startup that the env is good
   assert(*stderred.has_valid_env);
@@ -138,6 +228,18 @@ unit_test tests[] = {
   UNIT(perror),
   UNIT(error),
   UNIT(error_at_line),
+  UNIT(err),
+  UNIT(verr),
+  UNIT(errc),
+  UNIT(verrc),
+  UNIT(errx),
+  UNIT(verrx),
+  UNIT(warn),
+  UNIT(vwarn),
+  UNIT(warnc),
+  UNIT(vwarnc),
+  UNIT(warnx),
+  UNIT(vwarnx),
   UNIT(blacklist)
 };
 
