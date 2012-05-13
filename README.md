@@ -110,7 +110,7 @@ If you feel you will want universal library then build it this way:
 
 and export shell env like above.
 
-##### Aliasing instead of exporting LD_PRELOAD
+#### Aliasing instead of exporting LD_PRELOAD
 
 By exporting `LD_PRELOAD` env variable you're enabling stderred for all
 commands. If you prefer to enable it on ad-hoc (per command) basis instead then
