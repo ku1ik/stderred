@@ -237,14 +237,14 @@ void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned 
 
 int colorize_err_funcs = true;
 void FUNC(err_set_file)(void *fp) {
-  GET_ORIGINAL(err_set_file);
+  GET_ORIGINAL(void, err_set_file, void *);
   ORIGINAL(err_set_file)(fp);
   colorize_err_funcs = fp == NULL && COLORIZE(STDERR_FILENO) || COLORIZE(fileno(fp));
 }
 
 void FUNC(vwarnx)(const char *fmt, va_list args) {
-  GET_ORIGINAL(vwarnx);
-  GET_ORIGINAL(write);
+  GET_ORIGINAL(void, vwarnx, const char *, va_list);
+  GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
 
   if (colorize_err_funcs)
     ORIGINAL(write)(STDERR_FILENO, start_color_code, start_color_code_size);
@@ -256,8 +256,8 @@ void FUNC(vwarnx)(const char *fmt, va_list args) {
 }
 
 void FUNC(vwarnc)(int code, const char *fmt, va_list args) {
-  GET_ORIGINAL(vwarnc);
-  GET_ORIGINAL(write);
+  GET_ORIGINAL(void, vwarnc, int, const char *, va_list);
+  GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
 
   if (colorize_err_funcs)
     ORIGINAL(write)(STDERR_FILENO, start_color_code, start_color_code_size);
