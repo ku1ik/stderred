@@ -174,14 +174,16 @@ void warnc(int code, const char *fmt, ...) {
 
 #ifndef HAVE_VWARNC
 void vwarnc(int code, const char *fmt, va_list args) {
-  fprintf(stderr, "%s: ", PROGRAM_NAME);
+  char *buf1, *buf2 = NULL;
 
-  if (fmt) {
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr, ": %s", strerror(code));
+  if (fmt && vasprintf(&buf1, fmt, args)) {
+    if (!asprintf(&buf2, "%s: %s", buf1, strerror(code))) buf2 = NULL;
+    free(buf1);
   }
 
-  fputc('\n', stderr);
+  fprintf(stderr, "%s: %s\n", PROGRAM_NAME, buf2 ? buf2 : "\0");
+
+  if (buf2) free(buf2);
 }
 #endif
 
@@ -200,12 +202,12 @@ void warnx(const char *fmt, ...) {
 
 #ifndef HAVE_VWARNX
 void vwarnx(const char *fmt, va_list args) {
-  fprintf(stderr, "%s: ", PROGRAM_NAME);
+  char *buf = NULL;
 
-  if (fmt) {
-    vfprintf(stderr, fmt, ap);
-  }
+  if (fmt) vasprintf(&buf, fmt, ap);
 
-  fputc('\n', stderr);
+  fprintf(stderr, "%s: %s\n", PROGRAM_NAME, buf ? buf : "\0");
+
+  if (buf) free(buf);
 }
 #endif
