@@ -41,16 +41,28 @@ dist_prepare: dist_clean
 	cp usr/share/stderred/stderred.sh dist/usr/share/stderred/
 	cp README.md dist/usr/share/doc/stderred-$(version)/
 
+package_deb_32: 32 dist_prepare
+	rm -f *386.deb
+	mkdir -p dist/usr/lib
+	cp lib/libstderred.so dist/usr/lib/
+	fpm -s dir -t deb -n $(pkg_name) -v $(version) -a i386 --license $(license) --vendor $(vendor) -m $(maintainer) --description $(description) --url $(url) -C dist usr
+
 package_deb_64: 64 dist_prepare
-	rm -f *.deb
+	rm -f *amd64.deb
 	mkdir -p dist/usr/lib
 	cp lib64/libstderred.so dist/usr/lib/
-	fpm -s dir -t deb -n $(pkg_name) -v $(version) --license $(license) --vendor $(vendor) -m $(maintainer) --description $(description) --url $(url) -C dist usr
+	fpm -s dir -t deb -n $(pkg_name) -v $(version) -a amd64 --license $(license) --vendor $(vendor) -m $(maintainer) --description $(description) --url $(url) -C dist usr
+
+package_rpm_32: 32 dist_prepare
+	rm -f *i686.rpm
+	mkdir -p dist/usr/lib
+	cp lib/libstderred.so dist/usr/lib/
+	fpm -s dir -t rpm -n $(pkg_name) -v $(version) -a i686 --license $(license) --vendor $(vendor) -m $(maintainer) --description $(description) --url $(url) -C dist usr
 
 package_rpm_64: 32 64 dist_prepare
-	rm -f *.rpm
+	rm -f *x86_64.rpm
 	mkdir -p dist/usr/lib
 	mkdir -p dist/usr/lib64
 	cp lib/libstderred.so dist/usr/lib/
 	cp lib64/libstderred.so dist/usr/lib64/
-	fpm -s dir -t rpm -n $(pkg_name) -v $(version) --license $(license) --vendor $(vendor) -m $(maintainer) --description $(description) --url $(url) -C dist usr
+	fpm -s dir -t rpm -n $(pkg_name) -v $(version) -a x86_64 --license $(license) --vendor $(vendor) -m $(maintainer) --description $(description) --url $(url) -C dist usr
