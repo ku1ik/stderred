@@ -47,7 +47,8 @@ Clone the repository:
     $ git clone git://github.com/sickill/stderred.git
     $ cd stderred
 
-Important: In all cases below make sure that path to `libstderred.so` is absolute!
+Important: In all cases below make sure that path to `libstderred.so` is
+absolute!
 
 #### Linux and FreeBSD
 
@@ -63,7 +64,7 @@ shared library. Put following in your .bashrc/.zshrc:
 
     export LD_PRELOAD="/absolute/path/to/stderred/build/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
 
-##### Multi-arch Linux and FreeBSD
+##### Note for 64-bit Linux and FreeBSD
 
 With some Linux distros you can install 32-bit packages on 64-bit system.  Shared
 libraries compiled for 64-bit doesn't work with 32-bit binaries though. It
@@ -76,12 +77,8 @@ with "lib" or "lib64" respectively for 32 and 64-bit binaries when the binary
 is being run. Thanks to that you can compile stderred for both architectures
 and automatically use proper version of this shared library.
 
-On 64-bit Fedora, for example, you need to install libc development headers for
-both architectures:
-
-    $ sudo yum install glibc-devel.i686 glibc-devel.x86_64
-
-compile it like this:
+First install libc development headers for both architectures and then compile
+it like this:
 
     $ make 32 && make 64
 
@@ -113,7 +110,18 @@ If you feel you will want universal library then build it this way:
 
 and export shell env like above.
 
-### Checking if it works
+##### Aliasing instead of exporting LD_PRELOAD
+
+By exporting `LD_PRELOAD` env variable you're enabling stderred for all
+commands. If you prefer to enable it on ad-hoc (per command) basis instead then
+don't export `LD_PRELOAD` but create an alias like this:
+
+    $ alias stderred="LD_PRELOAD=/absolute/path/to/build/libstderred.so\${LD_PRELOAD:+:\$LD_PRELOAD}"
+    $ stderred java lol
+
+This way you can selectively colorize stderr for the commands you run.
+
+## Checking if it works
 
     $ find -q
     $ cat nonexistingfile
@@ -124,14 +132,6 @@ and export shell env like above.
 Jola should be in a red and green dress.
 
 ![stderred in action](https://github.com/downloads/cehoffman/stderred/stderred.png)
-
-## Alternative way: aliasing
-
-Alternative to enabling it globally via shell config is to create alias and
-use it to selectively colorize stderr for the commands you run:
-
-    $ alias stderred="LD_PRELOAD=/absolute/path/to/build/libstderred.so\${LD_PRELOAD:+:\$LD_PRELOAD}"
-    $ stderred java lol
 
 ## Configuration
 
