@@ -1,3 +1,11 @@
+pkg_name = stderred
+version := $(shell git tag | grep 'v' | cut -d 'v' -f 2 | sort -nr | head -n 1)
+description = 'stderr in red'
+license = MIT
+vendor = 'Marcin Kulik'
+maintainer = 'Marcin Kulik <marcin.kulik+stderred@gmail.com>'
+url = https://github.com/sickill/stderred
+
 all: test
 
 build: clean
@@ -24,16 +32,25 @@ test: build
 clean:
 	rm -rf build lib lib64
 
-dist_prepare:
-	mkdir -p usr/share/doc/stderred && cp README.md usr/share/doc/stderred/
+dist_clean:
+	rm -rf dist
 
-package_deb: build dist_prepare
+dist_prepare: dist_clean
+	mkdir -p dist/usr/bin dist/usr/share/stderred dist/usr/share/doc/stderred-$(version)
+	cp usr/bin/stderred dist/usr/bin/
+	cp usr/share/stderred/stderred.sh dist/usr/share/stderred/
+	cp README.md dist/usr/share/doc/stderred-$(version)/
+
+package_deb_64: 64 dist_prepare
 	rm -f *.deb
-	mkdir -p usr/lib && cp build/libstderred.so usr/lib/
-	fpm -s dir -t deb -n stderred -v `git tag | grep v | cut -d 'v' -f 2 | sort -nr | head -n 1` --license MIT --vendor 'Marcin Kulik' -m 'Marcin Kulik <marcin.kulik+stderred@gmail.com>' --description "stderr in red" --url https://github.com/sickill/stderred usr/bin/stderred usr/lib/libstderred.so usr/share/stderred/stderred.sh usr/share/doc/stderred/README.md
+	mkdir -p dist/usr/lib
+	cp lib64/libstderred.so dist/usr/lib/
+	fpm -s dir -t deb -n $(pkg_name) -v $(version) --license $(license) --vendor $(vendor) -m $(maintainer) --description $(description) --url $(url) -C dist usr
 
 package_rpm_64: 32 64 dist_prepare
 	rm -f *.rpm
-	mkdir -p usr/lib && cp lib/libstderred.so usr/lib/
-	mkdir -p usr/lib64 && cp lib64/libstderred.so usr/lib64/
-	fpm -s dir -t rpm -n stderred -v `git tag | grep v | cut -d 'v' -f 2 | sort -nr | head -n 1` --license MIT --vendor 'Marcin Kulik' -m 'Marcin Kulik <marcin.kulik+stderred@gmail.com>' --description "stderr in red" --url https://github.com/sickill/stderred usr/bin/stderred usr/lib/libstderred.so usr/lib64/libstderred.so usr/share/stderred/stderred.sh usr/share/doc/stderred/README.md
+	mkdir -p dist/usr/lib
+	mkdir -p dist/usr/lib64
+	cp lib/libstderred.so dist/usr/lib/
+	cp lib64/libstderred.so dist/usr/lib64/
+	fpm -s dir -t rpm -n $(pkg_name) -v $(version) --license $(license) --vendor $(vendor) -m $(maintainer) --description $(description) --url $(url) -C dist usr

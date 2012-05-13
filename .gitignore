@@ -3,3 +3,4 @@ lib/
 lib64/
 *.deb
 *.rpm
+/dist
