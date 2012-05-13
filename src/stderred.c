@@ -282,10 +282,12 @@ void FUNC(err)(int eval, const char *fmt, ...) {
   } else {
     FUNC(verrc)(eval, errno, NULL, NULL);
   }
+  exit(eval); // Added to keep gcc from complaining - never reached
 }
 
 void FUNC(verr)(int eval, const char *fmt, va_list args) {
   FUNC(verrc)(eval, errno, fmt, args);
+  exit(eval); // Added to keep gcc from complaining - never reached
 }
 
 void FUNC(errc)(int eval, int code, const char *fmt, ...) {
@@ -297,6 +299,7 @@ void FUNC(errc)(int eval, int code, const char *fmt, ...) {
   } else {
     FUNC(verrc)(eval, code, NULL, NULL);
   }
+  exit(eval); // Added to keep gcc from complaining - never reached
 }
 
 void FUNC(verrx)(int eval, const char *fmt, va_list args) {
@@ -313,6 +316,7 @@ void FUNC(errx)(int eval, const char *fmt, ...) {
   } else {
     FUNC(verrx)(eval, NULL, NULL);
   }
+  exit(eval); // Added to keep gcc from complaining - never reached
 }
 
 void FUNC(warn)(const char *fmt, ...) {
