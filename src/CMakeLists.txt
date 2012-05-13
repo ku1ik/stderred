@@ -22,6 +22,7 @@ endif (HAVE_GLIBC)
 
 include(CheckIncludeFiles)
 check_include_files(error.h HAVE_ERROR_H)
+check_include_files(err.h HAVE_ERR_H)
 
 include(CheckFunctionExists)
 check_function_exists(fwrite_unlocked HAVE_FWRITE_UNLOCKED)
@@ -32,6 +33,20 @@ if (HAVE_FWRITE_UNLOCKED)
 endif (HAVE_FWRITE_UNLOCKED)
 check_function_exists(error HAVE_ERROR)
 check_function_exists(error_at_line HAVE_ERROR_AT_LINE)
+
+# BSD style error and warn functions
+check_function_exists(err HAVE_ERR)
+check_function_exists(verr HAVE_VERR)
+check_function_exists(errc HAVE_ERRC)
+check_function_exists(verrc HAVE_VERRC)
+check_function_exists(errx HAVE_ERRX)
+check_function_exists(verrx HAVE_VERRX)
+check_function_exists(warn HAVE_WARN)
+check_function_exists(vwarn HAVE_VWARN)
+check_function_exists(warnc HAVE_WARNC)
+check_function_exists(vwarnc HAVE_VWARNC)
+check_function_exists(warnx HAVE_WARNX)
+check_function_exists(vwarnx HAVE_VWARNX)
 
 if (NOT HAVE_GLIBC)
   check_function_exists(getprogname HAVE_GETPROGNAME)

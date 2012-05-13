@@ -235,6 +235,123 @@ void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned 
   if (status) exit(status);
 }
 
+int colorize_err_funcs = true;
+void FUNC(err_set_file)(void *fp) {
+  GET_ORIGINAL(err_set_file);
+  ORIGINAL(err_set_file)(fp);
+  colorize_err_funcs = fp == NULL && COLORIZE(STDERR_FILENO) || COLORIZE(fileno(fp));
+}
+
+void FUNC(vwarnx)(const char *fmt, va_list args) {
+  GET_ORIGINAL(vwarnx);
+  GET_ORIGINAL(write);
+
+  if (colorize_err_funcs)
+    ORIGINAL(write)(STDERR_FILENO, start_color_code, start_color_code_size);
+
+  ORIGINAL(vwarnx)(fmt, args);
+
+  if (colorize_err_funcs)
+    ORIGINAL(write)(STDERR_FILENO, end_color_code, end_color_code_size);
+}
+
+void FUNC(vwarnc)(int code, const char *fmt, va_list args) {
+  GET_ORIGINAL(vwarnc);
+  GET_ORIGINAL(write);
+
+  if (colorize_err_funcs)
+    ORIGINAL(write)(STDERR_FILENO, start_color_code, start_color_code_size);
+
+  ORIGINAL(vwarnc)(code, fmt, args);
+
+  if (colorize_err_funcs)
+    ORIGINAL(write)(STDERR_FILENO, end_color_code, end_color_code_size);
+}
+
+void FUNC(verrc)(int eval, int code, const char *fmt, va_list args) {
+  FUNC(vwarnc)(code, fmt, args);
+  exit(eval);
+}
+
+void FUNC(err)(int eval, const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    FUNC(verrc)(eval, errno, fmt, ap);
+    va_end(ap);
+  } else {
+    FUNC(verrc)(eval, errno, NULL, NULL);
+  }
+}
+
+void FUNC(verr)(int eval, const char *fmt, va_list args) {
+  FUNC(verrc)(eval, errno, fmt, args);
+}
+
+void FUNC(errc)(int eval, int code, const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    FUNC(verrc)(eval, code, fmt, ap);
+    va_end(ap);
+  } else {
+    FUNC(verrc)(eval, code, NULL, NULL);
+  }
+}
+
+void FUNC(verrx)(int eval, const char *fmt, va_list args) {
+  FUNC(vwarnx)(fmt, args);
+  exit(eval);
+}
+
+void FUNC(errx)(int eval, const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    FUNC(verrx)(eval, fmt, ap);
+    va_end(ap);
+  } else {
+    FUNC(verrx)(eval, NULL, NULL);
+  }
+}
+
+void FUNC(warn)(const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    FUNC(vwarnc)(errno, fmt, ap);
+    va_end(ap);
+  } else {
+    FUNC(vwarnc)(errno, NULL, NULL);
+  }
+}
+
+void FUNC(vwarn)(const char *fmt, va_list args) {
+  FUNC(vwarnc)(errno, fmt, args);
+}
+
+void FUNC(warnc)(int code, const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    FUNC(vwarnc)(code, fmt, ap);
+    va_end(ap);
+  } else {
+    FUNC(vwarnc)(code, NULL, NULL);
+  }
+}
+
+void FUNC(warnx)(const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    FUNC(vwarnx)(fmt, ap);
+    va_end(ap);
+  } else {
+    FUNC(vwarnx)(NULL, NULL);
+  }
+}
+
 #ifdef __APPLE__
   #define INTERPOSE(name) { (void *)FUNC(name), (void *)name }
   typedef struct { void *new; void *old; } interpose;
@@ -253,5 +370,17 @@ void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned 
       INTERPOSE(perror),
       INTERPOSE(error),
       INTERPOSE(error_at_line),
+      INTERPOSE(err),
+      INTERPOSE(verr),
+      INTERPOSE(errc),
+      INTERPOSE(verrc),
+      INTERPOSE(errx),
+      INTERPOSE(verrx),
+      INTERPOSE(warn),
+      INTERPOSE(vwarn),
+      INTERPOSE(warnc),
+      INTERPOSE(vwarnc),
+      INTERPOSE(warnx),
+      INTERPOSE(vwarnx),
   };
 #endif

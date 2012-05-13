@@ -81,3 +81,131 @@ void error_at_line(int status, int errnum, const char *filename,
 }
 #endif
 
+#ifndef HAVE_ERR
+void err(int eval, const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    verrc(eval, errno, fmt, ap);
+    va_end(ap);
+  } else {
+    verrc(eval, errno, NULL, NULL);
+  }
+}
+#endif
+
+#ifndef HAVE_VERR
+void verr(int eval, const char *fmt, va_list args) {
+  verrc(eval, errno, fmt, args);
+}
+#endif
+
+#ifndef HAVE_ERRC
+void errc(int eval, int code, const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    verrc(eval, code, fmt, ap);
+    va_end(ap);
+  } else {
+    verrc(eval, code, NULL, NULL);
+  }
+}
+#endif
+
+#ifndef HAVE_VERRC
+void verrc(int eval, int code, const char *fmt, va_list args) {
+  vwarnc(code, fmt, args);
+  exit(eval);
+}
+#endif
+
+#ifndef HAVE_ERRX
+void errx(int eval, const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    verrx(eval, fmt, ap);
+    va_end(ap);
+  } else {
+    verrx(eval, NULL, NULL);
+  }
+}
+#endif
+
+#ifndef HAVE_VERRX
+void verrx(int eval, const char *fmt, va_list args) {
+  vwarnx(fmt, args);
+  exit(eval);
+}
+#endif
+
+#ifndef HAVE_WARN
+void warn(const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    vwarnc(errno, fmt, ap);
+    va_end(ap);
+  } else {
+    vwarnc(errno, NULL, NULL);
+  }
+}
+#endif
+
+#ifndef HAVE_VWARN
+void vwarn(const char *fmt, va_list args) {
+  vwarnc(errno, fmt, args);
+}
+#endif
+
+#ifndef HAVE_WARNC
+void warnc(int code, const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    vwarnc(code, fmt, ap);
+    va_end(ap);
+  } else {
+    vwarnc(code, NULL, NULL);
+  }
+}
+#endif
+
+#ifndef HAVE_VWARNC
+void vwarnc(int code, const char *fmt, va_list args) {
+  fprintf(stderr, "%s: ", PROGRAM_NAME);
+
+  if (fmt) {
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr, ": %s", strerror(code));
+  }
+
+  fputc('\n', stderr);
+}
+#endif
+
+#ifndef HAVE_WARNX
+void warnx(const char *fmt, ...) {
+  if (fmt) {
+    va_list ap;
+    va_start(ap, fmt);
+    vwarnx(fmt, ap);
+    va_end(ap);
+  } else {
+    vwarnx(NULL, NULL);
+  }
+}
+#endif
+
+#ifndef HAVE_VWARNX
+void vwarnx(const char *fmt, va_list args) {
+  fprintf(stderr, "%s: ", PROGRAM_NAME);
+
+  if (fmt) {
+    vfprintf(stderr, fmt, ap);
+  }
+
+  fputc('\n', stderr);
+}
+#endif
