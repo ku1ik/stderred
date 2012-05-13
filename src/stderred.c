@@ -223,7 +223,7 @@ void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned 
   char *buf;
   va_list args;
   va_start(args, format);
-  if ( vasprintf(&buf, format, args) > 0) {
+  if (vasprintf(&buf, format, args) > 0) {
     ORIGINAL(error_at_line)(0, errnum, filename, linenum, buf);
     free(buf);
   }
