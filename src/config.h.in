@@ -12,10 +12,29 @@
 #cmakedefine HAVE_ERROR
 #cmakedefine HAVE_ERROR_AT_LINE
 
+#cmakedefine HAVE_ERR_H
+#cmakedefine HAVE_ERR
+#cmakedefine HAVE_VERR
+#cmakedefine HAVE_ERRC
+#cmakedefine HAVE_VERRC
+#cmakedefine HAVE_ERRX
+#cmakedefine HAVE_VERRX
+#cmakedefine HAVE_WARN
+#cmakedefine HAVE_VWARN
+#cmakedefine HAVE_WARNC
+#cmakedefine HAVE_VWARNC
+#cmakedefine HAVE_WARNX
+#cmakedefine HAVE_VWARNX
+#cmakedefine HAVE_ERR_SET_FILE
+
 #cmakedefine HAVE_GETPROGNAME
 
 #ifdef HAVE_ERROR_H
   #include <error.h>
+#endif
+
+#ifdef HAVE_ERR_H
+  #include <err.h>
 #endif
 
 #ifdef HAVE_GLIBC

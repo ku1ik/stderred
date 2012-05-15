@@ -28,5 +28,57 @@ void error_at_line(int status, int errnum, const char *filename,
     unsigned int linenum, const char *format, ...);
 #endif
 
+#ifndef HAVE_ERR
+void err(int eval, const char *fmt, ...);
+#endif
+
+#ifndef HAVE_VERR
+void verr(int eval, const char *fmt, va_list args);
+#endif
+
+#ifndef HAVE_ERRC
+void errc(int eval, int code, const char *fmt, ...);
+#endif
+
+#ifndef HAVE_VERRC
+void verrc(int eval, int code, const char *fmt, va_list args);
+#endif
+
+#ifndef HAVE_ERRX
+void errx(int eval, const char *fmt, ...);
+#endif
+
+#ifndef HAVE_VERRX
+void verrx(int eval, const char *fmt, va_list args);
+#endif
+
+#ifndef HAVE_WARN
+void warn(const char *fmt, ...);
+#endif
+
+#ifndef HAVE_VWARN
+void vwarn(const char *fmt, va_list args);
+#endif
+
+#ifndef HAVE_WARNC
+void warnc(int code, const char *fmt, ...);
+#endif
+
+#ifndef HAVE_VWARNC
+void vwarnc(int code, const char *fmt, va_list args);
+#endif
+
+#ifndef HAVE_WARNX
+void warnx(const char *fmt, ...);
+#endif
+
+#ifndef HAVE_VWARNX
+void vwarnx(const char *fmt, va_list args);
+#endif
+
+#ifndef HAVE_ERR_SET_FILE
+void err_set_file(void *fp);
+#endif
+
 #endif /* end of include guard: POLYFIL_H_WFSH9MOG */
 
