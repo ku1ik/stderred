@@ -1,0 +1,4 @@
+usr/bin/*
+usr/lib/lib*.so.*
+usr/share/doc/*
+usr/share/stderred/*

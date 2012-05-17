@@ -1,0 +1,19 @@
+Source: stderred
+Priority: extra
+Maintainer: Marcin Kulik <marcin.kulik@gmail.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.2
+Section: utils
+Homepage: https://github.com/sickill/stderred
+
+Package: stderred
+Section: utils
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: stderr in red
+ stderred hooks on write() and a family of stream functions (fwrite, fprintf,
+ error...) from libc in order to colorize all stderr output that goes to
+ terminal thus making it distinguishable from stdout. Basically it wraps text
+ that goes to file with descriptor "2" with proper ANSI escape codes making text
+ red. It's implemented as a shared library and doesn't require recompilation of
+ existing binaries thanks to preload/insert feature of dynamic linkers.
