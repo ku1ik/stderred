@@ -36,3 +36,9 @@ package_rpm_64: dist_prepare
 	rm -f *.rpm
 	mkdir -p usr/lib64 && cp build/libstderred.so usr/lib64/
 	fpm -s dir -t rpm -n stderred -v `git tag | grep v | cut -d 'v' -f 2 | sort -nr | head -n 1` --license MIT --vendor 'Marcin Kulik' -m 'Marcin Kulik <marcin.kulik+stderred@gmail.com>' --description "stderr in red" --url https://github.com/sickill/stderred usr/bin/stderred usr/lib64/libstderred.so usr/share/stderred/stderred.sh usr/share/doc/stderred/README.md
+
+install:
+	mkdir -p ${DESTDIR}/usr/bin && cp usr/bin/stderred ${DESTDIR}/usr/bin/
+	mkdir -p ${DESTDIR}/usr/lib && cp usr/lib/libstderred.so ${DESTDIR}/usr/lib/
+	mkdir -p ${DESTDIR}/usr/share/stderred && cp usr/share/stderred/stderred.sh ${DESTDIR}/usr/share/stderred/
+	mkdir -p ${DESTDIR}/usr/share/doc/stderred && cp usr/share/doc/stderred/README.md ${DESTDIR}/usr/share/doc/stderred/
