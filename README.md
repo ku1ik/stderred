@@ -126,7 +126,9 @@ If you prefer other color or you want to use additional escape codes
 
 Here's an example for bold red:
 
-    export STDERRED_ESC_CODE=`echo -e "\e[1;31m"`
+    bold=$(tput bold || tput md)
+    red=$(tput setaf 1)
+    export STDERRED_ESC_CODE=`echo -e "$bold$red"`
 
 ### Program Blacklisting
 
