@@ -26,6 +26,10 @@
     }
 #endif
 
+#ifdef fwrite_unlocked
+  #undef fwrite_unlocked
+#endif
+
 
 char *start_color_code;
 size_t start_color_code_size;
