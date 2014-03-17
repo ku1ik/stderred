@@ -73,11 +73,11 @@ add_library(test_stderred SHARED mocks.c ${stderred_sources})
 add_executable(test_runner test.c)
 
 add_library(polyfill SHARED polyfill.c)
-target_link_libraries(test_runner dl polyfill)
+target_link_libraries(test_runner ${CMAKE_DL_LIBS} polyfill)
 
 if (NOT APPLE)
-  target_link_libraries(stderred dl)
-  target_link_libraries(test_stderred dl)
+  target_link_libraries(stderred ${CMAKE_DL_LIBS})
+  target_link_libraries(test_stderred ${CMAKE_DL_LIBS})
 endif(NOT APPLE)
 
 install(TARGETS stderred DESTINATION lib)
