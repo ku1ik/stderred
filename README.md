@@ -29,13 +29,16 @@ Important: In all cases below make sure that path to `libstderred.so` is absolut
 
 ### Linux and FreeBSD
 
-Make sure you have gcc toolchain required for compilation installed:
+Make sure you have cmake and the gcc toolchain required for compilation installed:
 
     # Ubuntu
     sudo apt-get install build-essential cmake
 
     # Fedora
     sudo yum install make cmake gcc gcc-c++
+
+    # FreeBSD
+    pkg install cmake
 
 Build:
 
