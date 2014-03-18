@@ -13,7 +13,7 @@
   #define GET_ORIGINAL(...)
 #else
   #include <dlfcn.h>
-  #define FUNC(name) name
+  #define FUNC(name) (name)
   #define ORIGINAL(name) original_##name
   #define GET_ORIGINAL(ret, name, ...) \
     static ret (*ORIGINAL(name))(__VA_ARGS__) = NULL; \
