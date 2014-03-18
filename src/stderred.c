@@ -239,7 +239,7 @@ int colorize_err_funcs = true;
 void FUNC(err_set_file)(void *fp) {
   GET_ORIGINAL(void, err_set_file, void *);
   ORIGINAL(err_set_file)(fp);
-  colorize_err_funcs = (fp == NULL && COLORIZE(STDERR_FILENO)) || COLORIZE(fileno(fp));
+  colorize_err_funcs = (fp == NULL && COLORIZE(STDERR_FILENO)) || COLORIZE(fileno((FILE *)fp));
 }
 
 void FUNC(vwarnx)(const char *fmt, va_list args) {
