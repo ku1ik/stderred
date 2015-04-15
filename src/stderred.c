@@ -242,6 +242,20 @@ void FUNC(err_set_file)(void *fp) {
   colorize_err_funcs = (fp == NULL && COLORIZE(STDERR_FILENO)) || COLORIZE(fileno((FILE *)fp));
 }
 
+void FUNC(vwarn)(const char *fmt, va_list args) {
+  GET_ORIGINAL(void, vwarn, const char *, va_list);
+  GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
+
+  if (colorize_err_funcs)
+    ORIGINAL(write)(STDERR_FILENO, start_color_code, start_color_code_size);
+
+  ORIGINAL(vwarn)(fmt, args);
+
+  if (colorize_err_funcs)
+    ORIGINAL(write)(STDERR_FILENO, end_color_code, end_color_code_size);
+}
+
+
 void FUNC(vwarnx)(const char *fmt, va_list args) {
   GET_ORIGINAL(void, vwarnx, const char *, va_list);
   GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
@@ -268,6 +282,11 @@ void FUNC(vwarnc)(int code, const char *fmt, va_list args) {
     ORIGINAL(write)(STDERR_FILENO, end_color_code, end_color_code_size);
 }
 
+void FUNC(verr)(int eval, const char *fmt, va_list args) {
+  FUNC(vwarn)(fmt, args);
+  exit(eval);
+}
+
 void FUNC(verrc)(int eval, int code, const char *fmt, va_list args) {
   FUNC(vwarnc)(code, fmt, args);
   exit(eval);
@@ -276,13 +295,8 @@ void FUNC(verrc)(int eval, int code, const char *fmt, va_list args) {
 void FUNC(err)(int eval, const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  FUNC(verrc)(eval, errno, fmt, ap);
+  FUNC(verr)(eval, fmt, ap);
   va_end(ap);
-  exit(eval); // Added to keep gcc from complaining - never reached
-}
-
-void FUNC(verr)(int eval, const char *fmt, va_list args) {
-  FUNC(verrc)(eval, errno, fmt, args);
   exit(eval); // Added to keep gcc from complaining - never reached
 }
 
@@ -310,12 +324,8 @@ void FUNC(errx)(int eval, const char *fmt, ...) {
 void FUNC(warn)(const char *fmt, ...) {
   va_list ap;
   va_start(ap, fmt);
-  FUNC(vwarnc)(errno, fmt, ap);
+  FUNC(vwarn)(fmt, ap);
   va_end(ap);
-}
-
-void FUNC(vwarn)(const char *fmt, va_list args) {
-  FUNC(vwarnc)(errno, fmt, args);
 }
 
 void FUNC(warnc)(int code, const char *fmt, ...) {
