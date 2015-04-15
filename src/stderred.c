@@ -274,14 +274,10 @@ void FUNC(verrc)(int eval, int code, const char *fmt, va_list args) {
 }
 
 void FUNC(err)(int eval, const char *fmt, ...) {
-  if (fmt) {
-    va_list ap;
-    va_start(ap, fmt);
-    FUNC(verrc)(eval, errno, fmt, ap);
-    va_end(ap);
-  } else {
-    FUNC(verrc)(eval, errno, NULL, NULL);
-  }
+  va_list ap;
+  va_start(ap, fmt);
+  FUNC(verrc)(eval, errno, fmt, ap);
+  va_end(ap);
   exit(eval); // Added to keep gcc from complaining - never reached
 }
 
@@ -291,14 +287,10 @@ void FUNC(verr)(int eval, const char *fmt, va_list args) {
 }
 
 void FUNC(errc)(int eval, int code, const char *fmt, ...) {
-  if (fmt) {
-    va_list ap;
-    va_start(ap, fmt);
-    FUNC(verrc)(eval, code, fmt, ap);
-    va_end(ap);
-  } else {
-    FUNC(verrc)(eval, code, NULL, NULL);
-  }
+  va_list ap;
+  va_start(ap, fmt);
+  FUNC(verrc)(eval, code, fmt, ap);
+  va_end(ap);
   exit(eval); // Added to keep gcc from complaining - never reached
 }
 
@@ -308,26 +300,18 @@ void FUNC(verrx)(int eval, const char *fmt, va_list args) {
 }
 
 void FUNC(errx)(int eval, const char *fmt, ...) {
-  if (fmt) {
-    va_list ap;
-    va_start(ap, fmt);
-    FUNC(verrx)(eval, fmt, ap);
-    va_end(ap);
-  } else {
-    FUNC(verrx)(eval, fmt, NULL);
-  }
+  va_list ap;
+  va_start(ap, fmt);
+  FUNC(verrx)(eval, fmt, ap);
+  va_end(ap);
   exit(eval); // Added to keep gcc from complaining - never reached
 }
 
 void FUNC(warn)(const char *fmt, ...) {
-  if (fmt) {
-    va_list ap;
-    va_start(ap, fmt);
-    FUNC(vwarnc)(errno, fmt, ap);
-    va_end(ap);
-  } else {
-    FUNC(vwarnc)(errno, NULL, NULL);
-  }
+  va_list ap;
+  va_start(ap, fmt);
+  FUNC(vwarnc)(errno, fmt, ap);
+  va_end(ap);
 }
 
 void FUNC(vwarn)(const char *fmt, va_list args) {
@@ -335,25 +319,17 @@ void FUNC(vwarn)(const char *fmt, va_list args) {
 }
 
 void FUNC(warnc)(int code, const char *fmt, ...) {
-  if (fmt) {
-    va_list ap;
-    va_start(ap, fmt);
-    FUNC(vwarnc)(code, fmt, ap);
-    va_end(ap);
-  } else {
-    FUNC(vwarnc)(code, NULL, NULL);
-  }
+  va_list ap;
+  va_start(ap, fmt);
+  FUNC(vwarnc)(code, fmt, ap);
+  va_end(ap);
 }
 
 void FUNC(warnx)(const char *fmt, ...) {
-  if (fmt) {
-    va_list ap;
-    va_start(ap, fmt);
-    FUNC(vwarnx)(fmt, ap);
-    va_end(ap);
-  } else {
-    FUNC(vwarnx)(fmt, NULL);
-  }
+  va_list ap;
+  va_start(ap, fmt);
+  FUNC(vwarnx)(fmt, ap);
+  va_end(ap);
 }
 
 #ifdef __APPLE__

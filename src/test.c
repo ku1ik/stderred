@@ -101,6 +101,10 @@ TEST(err) {
   err(EXIT_SUCCESS, "%s", "2 err");
 }
 
+TEST(err_empty) {
+  err(EXIT_SUCCESS, "2 err_empty");
+}
+
 static void test_verr_helper(int eval, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
@@ -114,6 +118,10 @@ TEST(verr) {
 
 TEST(errc) {
   errc(EXIT_SUCCESS, ENOSYS, "%s", "2 errc");
+}
+
+TEST(errc_empty) {
+  errc(EXIT_SUCCESS, ENOSYS, "2 errc_empty");
 }
 
 static void test_verrc_helper(int eval, int code, const char *fmt, ...) {
@@ -131,6 +139,10 @@ TEST(errx) {
   errx(EXIT_SUCCESS, "%s", "2 errx");
 }
 
+TEST(errx_empty) {
+  errx(EXIT_SUCCESS, "2 errx_empty");
+}
+
 static void test_verrx_helper(int eval, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
@@ -144,6 +156,10 @@ TEST(verrx) {
 
 TEST(warn) {
   warn("%s", "2 warn");
+}
+
+TEST(warn_empty) {
+  warn("2 warn_empty");
 }
 
 static void test_vwarn_helper(const char *fmt, ...) {
@@ -161,6 +177,10 @@ TEST(warnc) {
   warnc(ENOSYS, "%s", "2 warnc");
 }
 
+TEST(warnc_empty) {
+  warnc(ENOSYS, "2 warnc_empty");
+}
+
 static void test_vwarnc_helper(int code, const char *fmt, ...) {
   va_list args;
   va_start(args, fmt);
@@ -174,6 +194,10 @@ TEST(vwarnc) {
 
 TEST(warnx) {
   warnx("%s", "2 warnx");
+}
+
+TEST(warnx_empty) {
+  warnx("2 warnx_empty");
 }
 
 static void test_vwarnx_helper(const char *fmt, ...) {
@@ -238,16 +262,22 @@ unit_test tests[] = {
   UNIT(error),
   UNIT(error_at_line),
   UNIT(err),
+  UNIT(err_empty),
   UNIT(verr),
   UNIT(errc),
+  UNIT(errc_empty),
   UNIT(verrc),
   UNIT(errx),
+  UNIT(errx_empty),
   UNIT(verrx),
   UNIT(warn),
+  UNIT(warn_empty),
   UNIT(vwarn),
   UNIT(warnc),
+  UNIT(warnc_empty),
   UNIT(vwarnc),
   UNIT(warnx),
+  UNIT(warnx_empty),
   UNIT(vwarnx),
   UNIT(err_uses_set_file),
   UNIT(blacklist)
