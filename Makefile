@@ -21,6 +21,9 @@ clean64:
 test: build
 	cd build && make test
 
+install: build
+	cd build && make install
+
 clean: clean32 clean64
 	rm -rf build
 
