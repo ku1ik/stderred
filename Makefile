@@ -1,6 +1,6 @@
-all: test
+all: build
 
-build: clean
+build:
 	mkdir build && cd build && cmake ../src && make
 
 32: clean32
@@ -21,8 +21,8 @@ clean64:
 test: build
 	cd build && make test
 
-clean:
-	rm -rf build lib lib64
+clean: clean32 clean64
+	rm -rf build
 
 dist_prepare: test
 	mkdir -p usr/share/doc/stderred && cp README.md usr/share/doc/stderred/
