@@ -149,7 +149,7 @@ starting with "test":
 
 Simpler and much less reliable solution when using Zsh is to use named pipes
 trick proposed on
-[Gentoo Linux wiki](http://en.gentoo-wiki.com/wiki/Zsh#Colorize_STDERR).
+the [archived Gentoo Linux wiki](http://www.gentoo-wiki.info/Zsh#Colorize_STDERR).
 It has some race condition/buffering issues and breaks on interactive commands
 writing to stderr though.
 
