@@ -16,7 +16,7 @@ existing binaries thanks to _preload/insert_ feature of dynamic linkers.
 It's supported on Linux (with `LD_PRELOAD`), FreeBSD (also `LD_PRELOAD`) and
 OSX (with `DYLD_INSERT_LIBRARIES`).
 
-Watch this [intro asciicast](http://ascii.io/a/1705) to see it in action.
+Watch this [intro asciicast](https://asciinema.org/a/1705) to see it in action.
 
 ## Installation
 
