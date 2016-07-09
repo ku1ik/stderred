@@ -147,8 +147,9 @@ int FUNC(fputs_unlocked)(const char *str, FILE *stream) {
 int FUNC(vfprintf)(FILE *stream, const char *format, va_list ap) {
   char *buf = NULL;
 
-  if (vasprintf(&buf, format, ap) > 0) {
-    int result = FUNC(fwrite)(buf, sizeof(char), strlen(buf)/sizeof(char), stream);
+  int nprinted = vasprintf(&buf, format, ap);
+  if (nprinted > 0) {
+    int result = FUNC(fwrite)(buf, sizeof(char), nprinted, stream);
     free(buf);
     return result;
   } else {
@@ -170,8 +171,9 @@ int FUNC(fprintf_unlocked)(FILE *stream, const char *format, ...) {
   char *buf = NULL;
   int result = -1;
 
-  if ( vasprintf(&buf, format, args) > 0) {
-    result = FUNC(fwrite_unlocked)(buf, sizeof(char), strlen(buf)/sizeof(char), stream);
+  int nprinted = vasprintf(&buf, format, args);
+  if (nprinted > 0) {
+    result = FUNC(fwrite_unlocked)(buf, sizeof(char), nprinted, stream);
     free(buf);
   }
 
