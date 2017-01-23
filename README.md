@@ -107,9 +107,7 @@ and export shell env like above.
     $ python -c 'import os; print "Yo!"; os.write(2, "Jola\n\r")'
     $ STDERRED_ESC_CODE=$(echo -e '\e[;92m') ruby -e 'puts "Yo!"; warn "Jola"'
 
-Jola should be in a red and green dress.
-
-![stderred in action](https://github.com/downloads/cehoffman/stderred/stderred.png)
+"Jola" should be printed in red color.
 
 ## Alternative way: aliasing
 
