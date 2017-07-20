@@ -164,6 +164,16 @@ int FUNC(fprintf)(FILE *stream, const char *format, ...) {
   return result;
 }
 
+#ifdef HAVE__FPRINTF_CHK
+int FUNC(__fprintf_chk)(FILE *fp, int flag, const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  int result = FUNC(vfprintf)(fp, format, args);
+  va_end(args);
+  return result;
+}
+#endif
+
 int FUNC(fprintf_unlocked)(FILE *stream, const char *format, ...) {
   va_list args;
   va_start(args, format);
