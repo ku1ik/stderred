@@ -127,13 +127,43 @@ size_t FUNC(fwrite)(const void *data, size_t size, size_t count, FILE *stream) {
 }
 
 int FUNC(fputc)(int chr, FILE *stream) {
-  const unsigned char c[] = { (unsigned char)chr };
-  return FUNC(fwrite)(c, sizeof(char), sizeof(char), stream);
+  size_t result;
+  int fd = fileno(stream);
+
+  GET_ORIGINAL(int, fputc, int, FILE *);
+  GET_ORIGINAL(ssize_t, fwrite, const void*, size_t, size_t, FILE *);
+
+  if (COLORIZE(fd)) {
+    result = ORIGINAL(fwrite)(start_color_code, sizeof(char), start_color_code_size, stream);
+    if ((ssize_t)result < 0) return result;
+  }
+
+  result = ORIGINAL(fputc)(chr, stream);
+  if (COLORIZE(fd)) {
+    ORIGINAL(fwrite)(end_color_code, sizeof(char), end_color_code_size, stream);
+  }
+
+  return result;
 }
 
 int FUNC(fputc_unlocked)(int chr, FILE *stream) {
-  const unsigned char c[] = { (unsigned char)chr };
-  return FUNC(fwrite_unlocked)(c, sizeof(char), sizeof(char), stream);
+  size_t result;
+  int fd = fileno(stream);
+
+  GET_ORIGINAL(int, fputc_unlocked, int, FILE *);
+  GET_ORIGINAL(ssize_t, fwrite, const void*, size_t, size_t, FILE *);
+
+  if (COLORIZE(fd)) {
+    result = ORIGINAL(fwrite)(start_color_code, sizeof(char), start_color_code_size, stream);
+    if ((ssize_t)result < 0) return result;
+  }
+
+  result = ORIGINAL(fputc_unlocked)(chr, stream);
+  if (COLORIZE(fd)) {
+    ORIGINAL(fwrite)(end_color_code, sizeof(char), end_color_code_size, stream);
+  }
+
+  return result;
 }
 
 int FUNC(fputs)(const char *str, FILE *stream) {
