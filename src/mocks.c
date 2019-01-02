@@ -2,7 +2,7 @@
 #include "mocks.h"
 
 // Signature of library initialization function
-void init();
+void init_stderred();
 
 extern char *start_color_code;
 extern size_t start_color_code_size;
@@ -27,7 +27,7 @@ int isatty(int fildes) {
 }
 
 void init_mocks(struct stderred *stderred) {
-  stderred->init = &init;
+  stderred->init = &init_stderred;
   stderred->reset = &reset_stderred;
   stderred->has_valid_env = &is_valid_env;
   stderred->mock_tty = &mock_tty;
