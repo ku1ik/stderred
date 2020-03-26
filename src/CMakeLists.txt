@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 project(stderred)
 
 add_definitions(-std=c99)
@@ -84,15 +84,14 @@ endif(NOT APPLE)
 install(TARGETS stderred DESTINATION lib)
 
 include(CTest)
-get_property(stderred_lib_location TARGET test_stderred PROPERTY LOCATION)
 macro (do_test arg)
-  add_test (${arg} test_runner "${arg}")
+  add_test (NAME ${arg} COMMAND test_runner "${arg}")
   if (APPLE)
     set_tests_properties(${arg}
-      PROPERTIES ENVIRONMENT "DYLD_INSERT_LIBRARIES=${stderred_lib_location}")
+      PROPERTIES ENVIRONMENT "DYLD_INSERT_LIBRARIES=$<TARGET_FILE:test_stderred>")
   else (APPLE)
     set_tests_properties(${arg}
-      PROPERTIES ENVIRONMENT "LD_PRELOAD=${stderred_lib_location}")
+      PROPERTIES ENVIRONMENT "LD_PRELOAD=$<TARGET_FILE:test_stderred>")
   endif (APPLE)
 endmacro (do_test)
 
