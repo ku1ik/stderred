@@ -231,7 +231,7 @@ void FUNC(perror)(const char *msg) {
 
 void FUNC(error)(int status, int errnum, const char *format, ...) {
   GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
-  GET_ORIGINAL(void, error, int, int, const char *);
+  GET_ORIGINAL(void, error, int, int, const char *, ...);
 
   fflush(stdout);
 
@@ -242,7 +242,7 @@ void FUNC(error)(int status, int errnum, const char *format, ...) {
   va_list args;
   va_start(args, format);
   if (vasprintf(&buf, format, args) > 0) {
-    ORIGINAL(error)(0, errnum, buf);
+    ORIGINAL(error)(0, errnum, "%s", buf);
     free(buf);
   }
   va_end(args);
@@ -255,7 +255,7 @@ void FUNC(error)(int status, int errnum, const char *format, ...) {
 
 void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned int linenum, const char *format, ...) {
   GET_ORIGINAL(ssize_t, write, int, const void *, size_t);
-  GET_ORIGINAL(void, error_at_line, int, int, const char *, unsigned int, const char *);
+  GET_ORIGINAL(void, error_at_line, int, int, const char *, unsigned int, const char *, ...);
 
   fflush(stdout);
 
@@ -266,7 +266,7 @@ void FUNC(error_at_line)(int status, int errnum, const char *filename, unsigned 
   va_list args;
   va_start(args, format);
   if (vasprintf(&buf, format, args) > 0) {
-    ORIGINAL(error_at_line)(0, errnum, filename, linenum, buf);
+    ORIGINAL(error_at_line)(0, errnum, filename, linenum, "%s", buf);
     free(buf);
   }
   va_end(args);
