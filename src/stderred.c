@@ -36,7 +36,7 @@ size_t end_color_code_size;
 #define COLORIZE(fd) (is_valid_env && fd == STDERR_FILENO)
 bool is_valid_env = false;
 
-__attribute__((constructor)) void init() {
+__attribute__((constructor, visibility ("hidden"))) void init() {
   if (!strcmp("bash", PROGRAM_NAME)) return;
   if (!isatty(STDERR_FILENO)) return;
 
