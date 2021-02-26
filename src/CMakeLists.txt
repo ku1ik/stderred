@@ -49,6 +49,7 @@ check_function_exists(warnx HAVE_WARNX)
 check_function_exists(vwarnx HAVE_VWARNX)
 check_function_exists(err_set_file HAVE_ERR_SET_FILE)
 check_function_exists(__fprintf_chk HAVE__FPRINTF_CHK)
+check_function_exists(__write_nocancel HAVE__WRITE_NOCANCEL)
 
 if (NOT HAVE_GLIBC)
   check_function_exists(getprogname HAVE_GETPROGNAME)

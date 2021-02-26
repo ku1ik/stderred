@@ -27,6 +27,7 @@
 #cmakedefine HAVE_VWARNX
 #cmakedefine HAVE_ERR_SET_FILE
 #cmakedefine HAVE__FPRINTF_CHK
+#cmakedefine HAVE__WRITE_NOCANCEL
 
 #cmakedefine HAVE_GETPROGNAME
 
