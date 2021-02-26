@@ -143,14 +143,6 @@ starting with "test":
 
     export STDERRED_BLACKLIST="^(bash|test.*)$"
 
-## Alternative implementations
-
-Simpler and much less reliable solution when using Zsh is to use named pipes
-trick proposed on
-the [archived Gentoo Linux wiki](http://www.gentoo-wiki.info/Zsh#Colorize_STDERR).
-It has some race condition/buffering issues and breaks on interactive commands
-writing to stderr though.
-
 ## Authors
 
 Current implementation:
