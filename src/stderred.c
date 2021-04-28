@@ -13,6 +13,9 @@
   #define GET_ORIGINAL(...)
 #else
   #include <dlfcn.h>
+  #define user_ssize_t ssize_t
+  #define user_addr_t const void *
+  #define user_size_t size_t
   #define FUNC(name) (name)
   #define ORIGINAL(name) original_##name
   #define GET_ORIGINAL(ret, name, ...) \
