@@ -384,24 +384,24 @@ void FUNC(warnx)(const char *fmt, ...) {
   va_end(ap);
 }
 
-user_ssize_t __write_nocancel(int fd, user_addr_t cbuf, user_size_t nbyte);
-
 #ifdef HAVE__WRITE_NOCANCEL
-user_ssize_t FUNC(__write_nocancel)(int fd, user_addr_t cbuf, user_size_t nbyte) {
+ssize_t __write_nocancel(int fd, const void * cbuf, size_t nbyte);
+
+ssize_t FUNC(__write_nocancel)(int fd, const void * cbuf, size_t nbyte) {
   if (nbyte == 0) return 0;
 
-  user_ssize_t result;
+  ssize_t result;
 
-  GET_ORIGINAL(user_ssize_t, __write_nocancel, int, user_addr_t, user_size_t);
+  GET_ORIGINAL(ssize_t, __write_nocancel, int, const void *, size_t);
 
   if (COLORIZE(fd)) {
-    result = ORIGINAL(__write_nocancel)(fd, (user_addr_t)start_color_code, start_color_code_size);
+    result = ORIGINAL(__write_nocancel)(fd, (const void *)start_color_code, start_color_code_size);
     if (result < 0) return result;
   }
 
   result = ORIGINAL(__write_nocancel)(fd, cbuf, nbyte);
   if (result > 0 && COLORIZE(fd)) {
-    ORIGINAL(__write_nocancel)(fd, (user_addr_t)end_color_code, end_color_code_size);
+    ORIGINAL(__write_nocancel)(fd, (const void *)end_color_code, end_color_code_size);
   }
 
   return result;
