@@ -22,7 +22,7 @@ Watch this [intro asciicast](https://asciinema.org/a/1705) to see it in action.
 
 Clone this repository:
 
-    $ git clone git://github.com/sickill/stderred.git
+    $ git clone git://github.com/ku1ik/stderred.git
     $ cd stderred
 
 Important: In all cases below make sure that path to `libstderred.so` is absolute!
@@ -147,7 +147,7 @@ starting with "test":
 
 Current implementation:
 
-* [Marcin Kulik](https://github.com/sickill/)
+* [Marcin Kulik](https://github.com/ku1ik/)
 * [Chris Hoffman](https://github.com/cehoffman/)
 * [Brian Tarricone](https://github.com/kelnos/)
 
