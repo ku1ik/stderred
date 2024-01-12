@@ -88,7 +88,7 @@ void err_set_file(void *fp) {
 }
 #define ERR_OUTPUT err_output ? err_output : stderr
 #else
-  #define ERR_OUPUT stderr
+  #define ERR_OUTPUT stderr
 #endif
 
 #ifndef HAVE_ERR
