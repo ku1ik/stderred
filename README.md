@@ -2,6 +2,11 @@
 
 stderr in red.
 
+This fork adds improved support for [DomTerm](https://domterm.org):
+If the `DOMTERM` environment variable is set, emits the DomTerm-specfic
+escape sequendes for entering/exiting stderr.  This works better if there
+are other escape sequences in stderr; it also allows more flexible styling.
+
 ## About
 
 stderred hooks on write() and a family of stream functions (fwrite, fprintf,
