@@ -1,16 +1,28 @@
+ARCH := $(shell uname -m)
+
+ifeq ($(ARCH), x86_64)
+    CFLAGS := '-m64'
+else ifeq ($(ARCH), i686)
+    CFLAGS := '-m32'
+else ifeq ($(ARCH), aarch64)
+    CFLAGS := '-mabi=lp64'
+else
+    $(error Unsupported architecture: $(ARCH))
+endif
+
 all: build
 
 build:
 	mkdir build && cd build && cmake ../src && make
 
 32: clean32
-	mkdir lib && cd lib && CFLAGS='-m32' cmake ../src && make && make test
+	mkdir lib && cd lib && CFLAGS=$(CFLAGS) cmake ../src && make && make test
 
 clean32:
 	rm -rf lib
 
 64: clean64
-	mkdir lib64 && cd lib64 && CFLAGS='-m64' cmake ../src && make && make test
+	mkdir lib64 && cd lib64 && CFLAGS=$(CFLAGS) cmake ../src && make && make test
 
 universal: clean
 	mkdir build && cd build && cmake ../src -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64e" && make && make test
