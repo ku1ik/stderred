@@ -1,7 +1,5 @@
-cmake_minimum_required(VERSION 3.0)
-project(stderred)
-
-add_definitions(-std=c99)
+cmake_minimum_required(VERSION 3.15)
+project(stderred LANGUAGES C)
 
 include(CheckCSourceCompiles)
 check_c_source_compiles("
@@ -14,11 +12,9 @@ check_c_source_compiles("
 )
 
 if (HAVE_GLIBC)
-  # Make the actual program compilation use _GNU_SOURCE
-  add_definitions(-D_GNU_SOURCE)
   # Make dependency checking have _GNU_SOURCE defined
   set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -D_GNU_SOURCE")
-endif (HAVE_GLIBC)
+endif()
 
 include(CheckIncludeFiles)
 check_include_files(error.h HAVE_ERROR_H)
@@ -30,7 +26,7 @@ if (HAVE_FWRITE_UNLOCKED)
   check_function_exists(fputs_unlocked HAVE_FPUTS_UNLOCKED)
   check_function_exists(fputc_unlocked HAVE_FPUTC_UNLOCKED)
   check_function_exists(fprintf_unlocked HAVE_FPRINTF_UNLOCKED)
-endif (HAVE_FWRITE_UNLOCKED)
+endif()
 check_function_exists(error HAVE_ERROR)
 check_function_exists(error_at_line HAVE_ERROR_AT_LINE)
 
@@ -53,54 +49,65 @@ check_function_exists(__write_nocancel HAVE__WRITE_NOCANCEL)
 
 if (NOT HAVE_GLIBC)
   check_function_exists(getprogname HAVE_GETPROGNAME)
-endif (NOT HAVE_GLIBC)
+endif()
 
 configure_file(
   "${PROJECT_SOURCE_DIR}/config.h.in"
   "${PROJECT_BINARY_DIR}/config.h"
 )
 
-include_directories("${PROJECT_BINARY_DIR}")
-
 set(stderred_sources stderred.c)
 
 # Because of the way functions are overridden on mac the
 # polyfill should be compiled into stderred instead of linked
 if (APPLE)
-  set(stderred_sources ${stderred_sources} polyfill.c)
-endif (APPLE)
+  list(APPEND stderred_sources polyfill.c)
+endif()
 
 add_library(stderred SHARED ${stderred_sources})
 add_library(test_stderred SHARED mocks.c ${stderred_sources})
 add_executable(test_runner test.c)
 
 add_library(polyfill SHARED polyfill.c)
-target_link_libraries(test_runner ${CMAKE_DL_LIBS} polyfill)
+
+set(all_targets stderred test_stderred test_runner polyfill)
+foreach(tgt IN LISTS all_targets)
+  set_target_properties(${tgt} PROPERTIES C_STANDARD 99 C_STANDARD_REQUIRED ON)
+  target_include_directories(${tgt} PRIVATE "${PROJECT_BINARY_DIR}")
+endforeach()
+
+if (HAVE_GLIBC)
+  foreach(tgt IN LISTS all_targets)
+    target_compile_definitions(${tgt} PRIVATE _GNU_SOURCE)
+  endforeach()
+endif()
+
+target_link_libraries(test_runner PRIVATE ${CMAKE_DL_LIBS} polyfill)
 
 if (NOT APPLE)
-  target_link_libraries(stderred ${CMAKE_DL_LIBS})
-  target_link_libraries(test_stderred ${CMAKE_DL_LIBS})
-endif(NOT APPLE)
+  target_link_libraries(stderred PRIVATE ${CMAKE_DL_LIBS})
+  target_link_libraries(test_stderred PRIVATE ${CMAKE_DL_LIBS})
+endif()
 
 install(TARGETS stderred DESTINATION lib)
 
 include(CTest)
-macro (do_test arg)
-  add_test (NAME ${arg} COMMAND test_runner "${arg}")
+macro(do_test arg)
+  add_test(NAME ${arg} COMMAND test_runner "${arg}")
   if (APPLE)
     set_tests_properties(${arg}
       PROPERTIES ENVIRONMENT "DYLD_INSERT_LIBRARIES=$<TARGET_FILE:test_stderred>")
-  else (APPLE)
+  else()
     set_tests_properties(${arg}
       PROPERTIES ENVIRONMENT "LD_PRELOAD=$<TARGET_FILE:test_stderred>")
-  endif (APPLE)
-endmacro (do_test)
+  endif()
+endmacro()
 
-macro (regex_test arg result)
+macro(regex_test arg result)
   do_test(${arg})
   set_tests_properties(${arg}
     PROPERTIES PASS_REGULAR_EXPRESSION ${result})
-endmacro (regex_test)
+endmacro()
 
 
 regex_test(printf "1 printf")
@@ -137,4 +144,3 @@ regex_test(warnx_empty ">test_runner: (<>)?2 warnx_empty(<>)?\\n<")
 regex_test(vwarnx ">test_runner: (<>)?2 vwarnx(<>)?\\n<")
 regex_test(err_uses_set_file "test_runner: 1 warnx\\n>>?test_runner: (<>)?2 warnx(<>)?\\n<")
 do_test(blacklist test_runner "blacklist")
-
