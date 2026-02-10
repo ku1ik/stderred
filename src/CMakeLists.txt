@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 4.2)
 project(stderred LANGUAGES C)
 
-include(CheckCSourceCompiles)
-check_c_source_compiles("
+include(CheckSourceCompiles)
+check_source_compiles(C "
   #include <features.h>
   #ifndef __GLIBC__
   #error no gnu here
@@ -16,9 +16,9 @@ if (HAVE_GLIBC)
   set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -D_GNU_SOURCE")
 endif()
 
-include(CheckIncludeFiles)
-check_include_files(error.h HAVE_ERROR_H)
-check_include_files(err.h HAVE_ERR_H)
+include(CheckIncludeFile)
+check_include_file(error.h HAVE_ERROR_H)
+check_include_file(err.h HAVE_ERR_H)
 
 include(CheckFunctionExists)
 check_function_exists(fwrite_unlocked HAVE_FWRITE_UNLOCKED)
