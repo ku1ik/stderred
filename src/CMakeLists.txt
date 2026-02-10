@@ -3,15 +3,13 @@ project(stderred LANGUAGES C)
 
 include(CheckSourceCompiles)
 check_source_compiles(C "
-  #include <features.h>
-  #ifndef __GLIBC__
-  #error no gnu here
-  #endif
-  int main() {}
-" HAVE_GLIBC
+  #define _GNU_SOURCE
+  #include <errno.h>
+  int main() { return program_invocation_short_name[0]; }
+" HAVE_PROGRAM_INVOCATION_SHORT_NAME
 )
 
-if (HAVE_GLIBC)
+if (HAVE_PROGRAM_INVOCATION_SHORT_NAME)
   # Make dependency checking have _GNU_SOURCE defined
   set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -D_GNU_SOURCE")
 endif()
@@ -49,7 +47,7 @@ check_function_exists(err_set_file HAVE_ERR_SET_FILE)
 check_function_exists(__fprintf_chk HAVE__FPRINTF_CHK)
 check_function_exists(__write_nocancel HAVE__WRITE_NOCANCEL)
 
-if (NOT HAVE_GLIBC)
+if (NOT HAVE_PROGRAM_INVOCATION_SHORT_NAME)
   check_function_exists(getprogname HAVE_GETPROGNAME)
 endif()
 
@@ -78,7 +76,7 @@ foreach(tgt IN LISTS all_targets)
   target_include_directories(${tgt} PRIVATE "${PROJECT_BINARY_DIR}")
 endforeach()
 
-if (HAVE_GLIBC)
+if (HAVE_PROGRAM_INVOCATION_SHORT_NAME)
   foreach(tgt IN LISTS all_targets)
     target_compile_definitions(${tgt} PRIVATE _GNU_SOURCE)
   endforeach()

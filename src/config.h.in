@@ -1,7 +1,7 @@
 #ifndef CONFIG_H_IN_95GLRFZR
 #define CONFIG_H_IN_95GLRFZR
 
-#cmakedefine HAVE_GLIBC
+#cmakedefine HAVE_PROGRAM_INVOCATION_SHORT_NAME
 
 #cmakedefine HAVE_FWRITE_UNLOCKED
 #cmakedefine HAVE_FPUTS_UNLOCKED
@@ -41,7 +41,7 @@
   #include <err.h>
 #endif
 
-#ifdef HAVE_GLIBC
+#ifdef HAVE_PROGRAM_INVOCATION_SHORT_NAME
   extern char *program_invocation_short_name;
   #define PROGRAM_NAME program_invocation_short_name
 #elif defined HAVE_GETPROGNAME
