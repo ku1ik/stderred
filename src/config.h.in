@@ -7,6 +7,8 @@
 #cmakedefine HAVE_FPUTS_UNLOCKED
 #cmakedefine HAVE_FPUTC_UNLOCKED
 #cmakedefine HAVE_FPRINTF_UNLOCKED
+#cmakedefine HAVE_PUTC
+#cmakedefine HAVE_PUTC_UNLOCKED
 
 #cmakedefine HAVE_ERROR_H
 #cmakedefine HAVE_ERROR

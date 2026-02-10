@@ -166,6 +166,50 @@ int FUNC(fputc_unlocked)(int chr, FILE *stream) {
   return result;
 }
 
+#ifdef HAVE_PUTC
+int FUNC(putc)(int chr, FILE *stream) {
+  size_t result;
+  int fd = fileno(stream);
+
+  GET_ORIGINAL(int, putc, int, FILE *);
+  GET_ORIGINAL(ssize_t, fwrite, const void*, size_t, size_t, FILE *);
+
+  if (COLORIZE(fd)) {
+    result = ORIGINAL(fwrite)(start_color_code, sizeof(char), start_color_code_size, stream);
+    if ((ssize_t)result < 0) return result;
+  }
+
+  result = ORIGINAL(putc)(chr, stream);
+  if (COLORIZE(fd)) {
+    ORIGINAL(fwrite)(end_color_code, sizeof(char), end_color_code_size, stream);
+  }
+
+  return result;
+}
+#endif
+
+#ifdef HAVE_PUTC_UNLOCKED
+int FUNC(putc_unlocked)(int chr, FILE *stream) {
+  size_t result;
+  int fd = fileno(stream);
+
+  GET_ORIGINAL(int, putc_unlocked, int, FILE *);
+  GET_ORIGINAL(ssize_t, fwrite, const void*, size_t, size_t, FILE *);
+
+  if (COLORIZE(fd)) {
+    result = ORIGINAL(fwrite)(start_color_code, sizeof(char), start_color_code_size, stream);
+    if ((ssize_t)result < 0) return result;
+  }
+
+  result = ORIGINAL(putc_unlocked)(chr, stream);
+  if (COLORIZE(fd)) {
+    ORIGINAL(fwrite)(end_color_code, sizeof(char), end_color_code_size, stream);
+  }
+
+  return result;
+}
+#endif
+
 int FUNC(fputs)(const char *str, FILE *stream) {
   return FUNC(fwrite)(str, sizeof(char), strlen(str)/sizeof(char), stream);
 }
@@ -421,6 +465,12 @@ ssize_t FUNC(__write_nocancel)(int fd, const void * cbuf, size_t nbyte) {
       INTERPOSE(fwrite_unlocked),
       INTERPOSE(fputc),
       INTERPOSE(fputc_unlocked),
+  #ifdef HAVE_PUTC
+      INTERPOSE(putc),
+  #endif
+  #ifdef HAVE_PUTC_UNLOCKED
+      INTERPOSE(putc_unlocked),
+  #endif
       INTERPOSE(fputs),
       INTERPOSE(fputs_unlocked),
       INTERPOSE(fprintf),

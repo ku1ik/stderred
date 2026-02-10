@@ -27,6 +27,8 @@ if (HAVE_FWRITE_UNLOCKED)
   check_function_exists(fputc_unlocked HAVE_FPUTC_UNLOCKED)
   check_function_exists(fprintf_unlocked HAVE_FPRINTF_UNLOCKED)
 endif()
+check_function_exists(putc HAVE_PUTC)
+check_function_exists(putc_unlocked HAVE_PUTC_UNLOCKED)
 check_function_exists(error HAVE_ERROR)
 check_function_exists(error_at_line HAVE_ERROR_AT_LINE)
 
@@ -114,13 +116,15 @@ regex_test(printf "1 printf")
 regex_test(write ">2 write<")
 regex_test(fwrite ">2 fwrite<")
 regex_test(fwrite_unlocked "(>><)?>2 fwrite_unlocked<(><<)?")
-# On macOS, libc internally uses __write_nocancel for I/O. Since b401c85 added
-# interposing of __write_nocancel, each low-level write to stderr gets its own
+# On macOS, libc internally uses __write_nocancel for I/O. Because stderred
+# interposes __write_nocancel, each low-level write to stderr gets its own
 # >...< wrapping. The start color ">" written by _fputc becomes ">><" and the
 # end color "<" becomes "><<" when the escape code characters are wrapped by
 # the __write_nocancel interposer.
 regex_test(fputc "(>><)?>2<(><<)? <= fputc")
 regex_test(fputc_unlocked "(>><)?>2<(><<)? <= fputc_unlocked")
+regex_test(putc "(>><)?>2<(><<)? <= putc")
+regex_test(putc_unlocked "(>><)?>2<(><<)? <= putc_unlocked")
 regex_test(fputs ">2 fputs<")
 regex_test(fputs_unlocked "(>><)?>2 fputs_unlocked<(><<)?")
 regex_test(fprintf ">2 fprintf<")
@@ -129,8 +133,8 @@ regex_test(vfprintf ">2 vfprintf<")
 regex_test(perror ">2 perror:[^\\n]+\\n<")
 # The polyfill error/error_at_line do multiple fprintf calls (program name,
 # message, errno string), each independently wrapped on macOS due to the
-# __write_nocancel interposing added in b401c85. The [<>]* flexibly matches
-# the escape code boundaries between content segments.
+# __write_nocancel interposing. The [<>]* flexibly matches the escape code
+# boundaries between content segments.
 regex_test(error "(>><)?>[^:]*test_runner: [<>]*2 error[^\\n]+\\n<(><<)?")
 regex_test(error_at_line "(>><)?>[^:]*test_runner:[^:]+:[0-9]+: [<>]*2 error_at_line[^\\n]+\\n<(><<)?")
 regex_test(err ">test_runner: (<>)?2 err(<>)?: [^\\n]+\\n<")

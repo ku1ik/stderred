@@ -58,6 +58,15 @@ TEST(fputc_unlocked) {
   printf(" <= fputc_unlocked"); fflush(stdout);
 }
 
+TEST(putc) {
+  putc(0x32, stderr); fflush(stderr); printf(" <= putc"); fflush(stdout);
+}
+
+TEST(putc_unlocked) {
+  putc_unlocked(0x32, stderr); fflush(stderr);
+  printf(" <= putc_unlocked"); fflush(stdout);
+}
+
 TEST(fputs) {
   fputs("2 fputs", stderr);
 }
@@ -253,6 +262,8 @@ unit_test tests[] = {
   UNIT(fwrite_unlocked),
   UNIT(fputc),
   UNIT(fputc_unlocked),
+  UNIT(putc),
+  UNIT(putc_unlocked),
   UNIT(fputs),
   UNIT(fputs_unlocked),
   UNIT(fprintf),
