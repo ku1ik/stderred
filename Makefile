@@ -1,3 +1,5 @@
+DOCKER ?= $(shell command -v docker 2>/dev/null || command -v podman 2>/dev/null)
+
 all: build
 
 build:
@@ -19,7 +21,28 @@ clean64:
 	rm -rf lib64
 
 test: build
-	cd build && make test
+	cd build && ctest --output-on-failure
+	$(MAKE) test-musl test-glibc
+
+test-musl:
+	@if [ -z "$(DOCKER)" ]; then echo "Skipping $@: no container engine found"; \
+	else $(DOCKER) run --rm -v $(CURDIR):/stderred:ro alpine:edge sh -c '\
+		set -e && \
+		apk add --no-cache cmake make gcc musl-dev >/dev/null 2>&1 && \
+		mkdir /build && cd /build && \
+		cmake /stderred/src && \
+		cmake --build . && \
+		ctest --output-on-failure'; fi
+
+test-glibc:
+	@if [ -z "$(DOCKER)" ]; then echo "Skipping $@: no container engine found"; \
+	else $(DOCKER) run --rm -v $(CURDIR):/stderred:ro debian:sid sh -c '\
+		set -e && \
+		apt-get update -qq && apt-get install -y -qq cmake gcc libc6-dev >/dev/null 2>&1 && \
+		mkdir /build && cd /build && \
+		cmake /stderred/src && \
+		cmake --build . && \
+		ctest --output-on-failure'; fi
 
 install: build
 	cd build && make install
