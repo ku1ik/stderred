@@ -55,7 +55,12 @@ __attribute__((constructor, visibility ("hidden"))) void init() {
 
   start_color_code = getenv("STDERRED_ESC_CODE");
   if (start_color_code == NULL) {
-    start_color_code = "\x1b[31m";
+      bool isDomTerm = getenv("DOMTERM") != NULL;
+      if (isDomTerm) {
+          start_color_code = "\033[12u";
+          end_color_code = "\033[11u";
+      } else
+          start_color_code = "\x1b[31m";
   }
   start_color_code_size = strlen(start_color_code);
   end_color_code_size = strlen(end_color_code);
