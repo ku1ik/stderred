@@ -121,9 +121,10 @@ use it to selectively colorize stderr for the commands you run:
 
 ### Custom color code
 
-If you prefer other color or you want to use additional escape codes
-(for bold/bright, italic, different background) you can export
-`STDERRED_ESC_CODE` with desired escape code sequence.
+If you prefer another color or text style (for bold/bright, italic,
+different background), you can export `STDERRED_ESC_CODE` with one or
+more ANSI SGR sequences. Non-SGR escape sequences are ignored and
+stderred falls back to the default red.
 
 Here's an example for bold red:
 

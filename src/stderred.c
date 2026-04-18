@@ -30,11 +30,31 @@
 char *start_color_code;
 size_t start_color_code_size;
 
+static char *default_start_color_code = "\x1b[31m";
 char *end_color_code = "\x1b[0m";
 size_t end_color_code_size;
 
 #define COLORIZE(fd) (is_valid_env && fd == STDERR_FILENO)
 bool is_valid_env = false;
+
+static bool is_valid_sgr_code(const char *code) {
+  if (code == NULL || *code == '\0') return false;
+
+  for (const unsigned char *cursor = (const unsigned char *)code; *cursor;) {
+    if (*cursor++ != '\x1b') return false;
+    if (*cursor++ != '[') return false;
+
+    while (*cursor && *cursor != 'm') {
+      if ((*cursor < '0' || *cursor > '9') && *cursor != ';') return false;
+      cursor++;
+    }
+
+    if (*cursor != 'm') return false;
+    cursor++;
+  }
+
+  return true;
+}
 
 __attribute__((constructor, visibility ("hidden"))) void init() {
   if (!strcmp("bash", PROGRAM_NAME)) return;
@@ -54,8 +74,8 @@ __attribute__((constructor, visibility ("hidden"))) void init() {
   is_valid_env = true;
 
   start_color_code = getenv("STDERRED_ESC_CODE");
-  if (start_color_code == NULL) {
-    start_color_code = "\x1b[31m";
+  if (!is_valid_sgr_code(start_color_code)) {
+    start_color_code = default_start_color_code;
   }
   start_color_code_size = strlen(start_color_code);
   end_color_code_size = strlen(end_color_code);

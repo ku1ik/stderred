@@ -255,6 +255,21 @@ TEST(blacklist) {
   assert(*stderred.has_valid_env);
 }
 
+TEST(esc_code) {
+  stderred.reset();
+  setenv("STDERRED_ESC_CODE", "\033[1m\033[31m", 1);
+  stderred.raw_init();
+
+  assert(*stderred.has_valid_env);
+  assert(!strcmp(*stderred.start_color_code, "\033[1m\033[31m"));
+  stderred.reset();
+  setenv("STDERRED_ESC_CODE", "\033]0;pwnd\a", 1);
+  stderred.raw_init();
+
+  assert(*stderred.has_valid_env);
+  assert(!strcmp(*stderred.start_color_code, "\033[31m"));
+}
+
 unit_test tests[] = {
   UNIT(printf),
   UNIT(write),
@@ -291,7 +306,8 @@ unit_test tests[] = {
   UNIT(warnx_empty),
   UNIT(vwarnx),
   UNIT(err_uses_set_file),
-  UNIT(blacklist)
+  UNIT(blacklist),
+  UNIT(esc_code)
 };
 
 

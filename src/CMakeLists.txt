@@ -154,5 +154,5 @@ regex_test(warnx ">test_runner: (<>)?2 warnx(<>)?\\n<")
 regex_test(warnx_empty ">test_runner: (<>)?2 warnx_empty(<>)?\\n<")
 regex_test(vwarnx ">test_runner: (<>)?2 vwarnx(<>)?\\n<")
 regex_test(err_uses_set_file "test_runner: 1 warnx\\n>>?test_runner: (<>)?2 warnx(<>)?\\n<")
-do_test(blacklist test_runner "blacklist")
-
+do_test(blacklist)
+do_test(esc_code)
