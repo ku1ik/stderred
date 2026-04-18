@@ -14,7 +14,7 @@ It's implemented as a shared library and doesn't require recompilation of
 existing binaries thanks to _preload/insert_ feature of dynamic linkers.
 
 It's supported on Linux (with `LD_PRELOAD`), FreeBSD (also `LD_PRELOAD`) and
-OSX (with `DYLD_INSERT_LIBRARIES`).
+macOS (with `DYLD_INSERT_LIBRARIES`).
 
 Watch this [intro asciicast](https://asciinema.org/a/1705) to see it in action.
 
@@ -77,7 +77,7 @@ and export `LD_PRELOAD` like this in your shell's config:
 
 _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gmane.org/gmane.comp.lib.glibc.user/974)._
 
-### OSX
+### macOS
 
     $ make
 
@@ -86,9 +86,17 @@ in your .bashrc/.zshrc:
 
     export DYLD_INSERT_LIBRARIES="/absolute/path/to/build/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
 
-#### Universal lib on OSX
+#### Homebrew
 
-OSX solves multi-arch problem (described above in "Multi-arch Linux and
+    $ brew install --HEAD ku1ik/stderred/stderred
+
+To enable `stderred` in every shell session, add this to your shell config:
+
+    export DYLD_INSERT_LIBRARIES="$(brew --prefix stderred)/lib/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
+
+#### Universal lib on macOS
+
+macOS solves multi-arch problem (described above in "Multi-arch Linux and
 FreeBSD") by supporting so called "universal" libraries that include 2 copies
 of code compiled for both 32 and 64-bit architecture in the single library
 file.
