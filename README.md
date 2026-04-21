@@ -86,6 +86,26 @@ in your .bashrc/.zshrc:
 
     export DYLD_INSERT_LIBRARIES="/absolute/path/to/build/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
 
+Note: On macOS, `DYLD_INSERT_LIBRARIES` is ignored for SIP-protected binaries,
+so `stderred` will not affect many Apple/system executables while SIP is
+enabled.
+
+If you want to try it with SIP disabled, open Recovery Terminal:
+
+* Apple silicon: shut down, hold the power button, choose `Options` >
+  `Continue`, then `Utilities` > `Terminal`
+* Intel: restart and hold `Cmd-R`, then `Utilities` > `Terminal`
+
+Then run:
+
+    csrutil disable
+    reboot
+
+To re-enable SIP later:
+
+    csrutil enable
+    reboot
+
 #### Homebrew
 
     $ brew install --HEAD ku1ik/stderred/stderred
