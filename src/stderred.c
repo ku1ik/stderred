@@ -58,6 +58,8 @@ static bool is_valid_sgr_code(const char *code) {
 
 __attribute__((constructor, visibility ("hidden"))) void init() {
   if (!strcmp("bash", PROGRAM_NAME)) return;
+  /* "tmux" spawns subshells with argv[0] prefixed with a '-', e.g. "-bash" */
+  if (PROGRAM_NAME && PROGRAM_NAME[0] == '-' && PROGRAM_NAME[1] != '\0') return;
   if (!isatty(STDERR_FILENO)) return;
 
   char *blacklist;
