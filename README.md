@@ -31,14 +31,16 @@ Important: In all cases below make sure that path to `libstderred.so` is absolut
 
 Make sure you have cmake and the gcc toolchain required for compilation installed:
 
-    # Ubuntu
-    sudo apt-get install build-essential cmake
+```shell
+# Ubuntu
+sudo apt-get install build-essential cmake
 
-    # Fedora
-    sudo yum install make cmake gcc gcc-c++
+# Fedora
+sudo yum install make cmake gcc gcc-c++
 
-    # FreeBSD
-    pkg install cmake
+# FreeBSD
+pkg install cmake
+```
 
 Build:
 
@@ -47,7 +49,9 @@ Build:
 Export `LD_PRELOAD` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export LD_PRELOAD="/absolute/path/to/stderred/build/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+```shell
+export LD_PRELOAD="/absolute/path/to/stderred/build/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+```
 
 #### Multi-arch Linux and FreeBSD
 
@@ -73,7 +77,9 @@ compile it like this:
 
 and export `LD_PRELOAD` like this in your shell's config:
 
-    export LD_PRELOAD="/path/to/stderred/\$LIB/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+```shell
+export LD_PRELOAD="/path/to/stderred/\$LIB/libstderred.so${LD_PRELOAD:+:$LD_PRELOAD}"
+```
 
 _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gmane.org/gmane.comp.lib.glibc.user/974)._
 
@@ -84,7 +90,9 @@ _\* Note that [there is no support for $LIB token on Ubuntu](http://comments.gma
 Export `DYLD_INSERT_LIBRARIES` variable in your shell's config file by putting following
 in your .bashrc/.zshrc:
 
-    export DYLD_INSERT_LIBRARIES="/absolute/path/to/build/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
+```shell
+export DYLD_INSERT_LIBRARIES="/absolute/path/to/build/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
+```
 
 Note: On macOS, `DYLD_INSERT_LIBRARIES` is ignored for SIP-protected binaries,
 so `stderred` will not affect many Apple/system executables while SIP is
@@ -112,7 +120,9 @@ To re-enable SIP later:
 
 To enable `stderred` in every shell session, add this to your shell config:
 
-    export DYLD_INSERT_LIBRARIES="$(brew --prefix stderred)/lib/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
+```shell
+export DYLD_INSERT_LIBRARIES="$(brew --prefix stderred)/lib/libstderred.dylib${DYLD_INSERT_LIBRARIES:+:$DYLD_INSERT_LIBRARIES}"
+```
 
 #### Universal lib on macOS
 
@@ -156,9 +166,11 @@ stderred falls back to the default red.
 
 Here's an example for bold red:
 
-    bold=$(tput bold || tput md)
-    red=$(tput setaf 1)
-    export STDERRED_ESC_CODE=`echo -e "$bold$red"`
+```shell
+bold=$(tput bold || tput md)
+red=$(tput setaf 1)
+export STDERRED_ESC_CODE=`echo -e "$bold$red"`
+```
 
 ### Program Blacklisting
 
@@ -170,7 +182,9 @@ matching names of these programs.
 Here's an example that will blacklist bash, and all programs with names
 starting with "test":
 
-    export STDERRED_BLACKLIST="^(bash|test.*)$"
+```shell
+export STDERRED_BLACKLIST="^(bash|test.*)$"
+```
 
 ## Authors
 
